@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+.ChatMenu{
+    flex: 3;
+}
+.ChatBox{
+    flex: 5;
+}
+.ChatOnline{
+    flex: 3;
+}
+
+.ChatBoxBottom{
+    margin-top: 5px;
+    display:flex;
+    align-items:center ;
+    justify-content: space-between;
+}
+
+.ChatMessageInput{
+    width: 80%;
+    height: 90px;
+    padding: 10px;
+}
+
+.ChatSubmitButton{
+    width: 70px;
+    height: 40px;
+    border: none;
+    border-radius:5px;
+    cursor:pointer;
+    background-color: teal;
+    color:white;
+
+
+}
+.ChatBoxTop{
+    height: 100%;
+    overflow-y:scroll ;
+    padding-right: 10px;
+
+}
+
+.ChatBoxWrapper{
+    display: flex;
+    flex-direction: column;
+    position:relative
+}
+
+.noConversationText{
+  position:absolute;
+  top:10%;
+  font-size: 30px;
+  color: rgb(red, green, blue);
+  text-align: center;
+  cursor: default;
+}

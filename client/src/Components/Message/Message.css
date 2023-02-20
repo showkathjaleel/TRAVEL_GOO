@@ -1,0 +1,94 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+
+.message{
+    display: flex;
+    flex-direction: column;
+    margin-top: 20 px;
+
+}
+.messageImg{
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+
+}
+.messageTop {
+    display: flex;
+}
+
+.messageText{
+   padding: 10px;
+   border-radius: 5px;
+   /* background-color: #111827; */
+   background-color: #1877f2;
+   color: white;
+   max-width: 300px;
+}
+
+.messageBottom{
+   font-size: 12px;
+   margin-top: 10px;
+}
+
+.message.own{
+    align-items: flex-end;
+}
+.conversationName{
+    font-weight:500;
+   
+}
+.message.own .messageText{
+    background-color: rgb(245,241,241);
+    color:black
+}
+
+/* //////////////////////////////////////////// */
+
+/* 
+.message{
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+.messageTop {
+    display: flex;
+}
+
+.messageImg {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.messageText {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #111827;
+    color: white ;
+    max-width: 300px;
+}
+
+.messageBottom{
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.message.own{
+    align-items: flex-end;
+}
+
+.message.own .messageText{
+    background-color: #064E3B;
+    color: white;
+} */

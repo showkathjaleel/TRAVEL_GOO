@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.ChatMenu{
+    flex: 3;
+}
+.ChatBox{
+    flex: 5;
+}
+.ChatOnline{
+    flex: 3;
+}
