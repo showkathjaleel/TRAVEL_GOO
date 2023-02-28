@@ -4,7 +4,7 @@ const crypto = require('crypto')
 require('dotenv').config()
 
 router.post('/guideregister', async (req, res) => {
-  console.log(req.body, 'kkkkkkkkkkkkkkkkk')
+  console.log('lllrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr')
   try {
     const instance = new Razorpay({
       key_id: process.env.RAZORPAY_KEY_ID,
@@ -48,6 +48,34 @@ router.post('/verifypayment', async (req, res) => {
     // console.log('sig generated ', expectedSignature)
     // const response = { signatureIsValid: 'false' }
     if (expectedSignature === razorpay_signature) {
+      const response = { signatureIsValid: 'true' }
+      res.send(response)
+    } else {
+      res.status(400).json({ message: 'Invalid signature' })
+    }
+  } catch (err) {
+    console.log(err)
+  }
+})
+
+router.post('/verify', async (req, res) => {
+  console.log('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
+  console.log(req.body, '111 verify payment il keri')
+  try {
+    console.log('qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq')
+    const {
+      paymentId,
+      orderId,
+      signature
+    } = req.body
+
+    const sign = orderId + '|' + paymentId
+    console.log(sign, 'sign of verifypayment')
+    const expectedSignature = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
+      .update(sign.toString())
+      .digest('hex')
+
+    if (expectedSignature === signature) {
       const response = { signatureIsValid: 'true' }
       res.send(response)
     } else {

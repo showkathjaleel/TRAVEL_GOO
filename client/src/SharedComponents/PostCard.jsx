@@ -6,37 +6,39 @@ import axios from "axios";
 import { AuthUser } from "../Context/AuthUser";
 import TimeAgo from "react-timeago";
 import useFetchUser from "../Utils/useFetchUser";
+//import { postComment } from "../api/post";
 
 function PostCard({ post }) {
-  // image is not coming because it is not directly going to profile login. It is coming as props
 
   const { userAuth } = useContext(AuthUser);
   const [like, setLike] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
-  const [user, setUser] = useState({});
+ // const [user, setUser] = useState({});
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [isSaved, setIsSaved] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
-  const [following, setFollowing] = useState(false);
-  // if(post.likes?.includes(userAuth._id)){
+
+   // if(post.likes?.includes(userAuth._id)){
   //   setIsLiked(true)
   // }
 
   // -------------------------fetch all the users in the posts-------------------------
-//  const user=useFetchUser(post.userId)
-  useEffect(() => {
-    fetchUser();
-  }, []);
+
+   const user=useFetchUser(post.userId)
+ 
+  // useEffect(() => {
+  //   fetchUser();
+  // }, []);
+  // const fetchUser = async () => {
+  //   const res = await axios.get(`api/getUser/${post.userId}`);
+  //   setUser(res.data);
+  // };
 
   useEffect(() => {
     setIsLiked(post.likes.includes(userAuth._id));
   }, [userAuth._id, post.likes]);
 
-  const fetchUser = async () => {
-    const res = await axios.get(`api/getUser/${post.userId}`);
-    setUser(res.data);
-  };
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -75,6 +77,14 @@ function PostCard({ post }) {
     }
   }
 
+  // const  handleCommentSubmit= (userId=user._id, postId=post._id,commentText)=>{
+  //   postComment(userId, postId, commentText).then((result)=>{
+  //     console.log(result,'result');
+  //     setComments([...comments, result]);
+  //     setCommentText("");    
+  //   })
+  // }
+
   function postDelete() {
     //if i want to make sure that the user is the owner of the id from from front end itself i can give currentuser._id
     axios
@@ -84,21 +94,23 @@ function PostCard({ post }) {
       .then((response) => {
         console.log(response);
       })
-      .catch((err) => {});
+      .catch((err) => {
+        console.log(err,'err from postdelete in postcard')
+      });
   }
 
-  function toggleSave() {
+  function toggleSave() {  //function to save the post
     axios
       .post("/posts/save/" + post._id, {
         userId: userAuth._id,
       })
       .then((response) => {
         setIsSaved(true);
-      });
+      })
+      .catch((err)=>{
+        console.log(err,'err from postsave in postcard')
+      })
   }
-
-  const nonActiveElement =
-    "flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300";
 
   const [isOpen, setIsOpen] = useState(false);
   const toggleDropdown = () => {
@@ -109,7 +121,7 @@ function PostCard({ post }) {
     await axios.put("/api/followUser/" + post.userId, {
       currentuser: userAuth._id, //ith thalkkalam comment cheythekkan.After review you have to uncomment this
     });
-    fetchUser();
+  
   };
 
   return (
@@ -118,7 +130,7 @@ function PostCard({ post }) {
         <div>
           <Link to="/profile">
             <span className="cursor-pointer">
-              <Avatar url={user.ProfilePicture || "images/images.jpeg"} />
+              <Avatar url={user?.ProfilePicture || "images/images.jpeg"} />
             </span>
           </Link>
         </div>
@@ -130,9 +142,9 @@ function PostCard({ post }) {
                 {authorProfile.name}
               </span>
             </Link> */}
-            <Link to={`/profile?userId=${user._id}`}>
+            <Link to={`/profile?userId=${user?._id}`}>
               <span className="mr-1 font-semibold cursor-pointer hover:underline">
-                {user.username}
+                {user?.username}
               </span>
             </Link>
             shared a post
@@ -143,13 +155,16 @@ function PostCard({ post }) {
         </div>
 
         <div className="relative flex">
-          <button
-            onClick={followHandler}
-            className="cursor-pointer inline-block text-sm px-4 py-2 leading-none border rounded  border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 lg:mt-0 ml-3"
-          >
-            {user.followers?.includes(userAuth._id) ? "following" : "follow"}
-          </button>
-          {/* {following && <button>following</button>} */}
+{post.userId === userAuth._id ? (
+         <p></p>
+      ) : (
+        <button
+        onClick={followHandler}
+        className="cursor-pointer inline-block text-sm px-4 py-2 leading-none border rounded  border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 lg:mt-0 ml-3"
+      >
+        {user?.followers?.includes(userAuth._id) ? "following" : "follow"}
+      </button>
+      )}        
           <button className="text-gray-400" onClick={toggleDropdown}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -208,9 +223,8 @@ function PostCard({ post }) {
                     {isSaved ? "Remove from saved" : "Save post"}
                   </span>
                 </button>
-
-                <a
-                  href=""
+              
+                <span
                   className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
                 >
                   <svg
@@ -228,10 +242,9 @@ function PostCard({ post }) {
                     />
                   </svg>
                   Turn notifications
-                </a>
+                </span>
 
-                <a
-                  href=""
+                <span
                   className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
                 >
                   <svg
@@ -249,11 +262,11 @@ function PostCard({ post }) {
                     />
                   </svg>
                   Hide post
-                </a>
+                </span>
 
                 <button
                   onClick={postDelete}
-                  className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
+                  className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -272,8 +285,7 @@ function PostCard({ post }) {
                   Delete
                 </button>
 
-                <a
-                  href=""
+                <span
                   className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300"
                 >
                   <svg
@@ -291,19 +303,19 @@ function PostCard({ post }) {
                     />
                   </svg>
                   Report
-                </a>
+                </span>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      <div>
+      <div >
         <p className="my-2 text-sm">{post.desc}</p>
 
         <div className="rounded-md overflow-hidden">
           {/* <Link to={`/profile?userId=${user._id}`}> */}
-          <img
+          <img 
             // src="https://cdn.pixabay.com/photo/2018/02/02/13/37/nature-3125452_960_720.jpg" alt="" />
             src={
               post.img
@@ -379,7 +391,8 @@ function PostCard({ post }) {
         </div>
 
         <div className="border grow rounded-full relative inline-flex">
-          <form onSubmit={postComment}>
+        <form onSubmit={postComment}> 
+        {/* <form onSubmit={handleCommentSubmit}> */}
             <input
               value={commentText}
               onChange={(ev) => setCommentText(ev.target.value)}

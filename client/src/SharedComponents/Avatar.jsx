@@ -152,7 +152,7 @@ function Avatar({ size, editable, url, onChange }) {
 
               <div className="">
                 <button
-                  className="inline-flex items-center m-5 px-4 py-2 text-white bg-indigo-600 border border-indigo-600 rounded rounded-full hover:bg-indigo-700 focus:outline-none focus:ring"
+                  className="inline-flex items-center m-5 px-4 py-2 text-white bg-indigo-600 border border-indigo-600  rounded-full hover:bg-indigo-700 focus:outline-none focus:ring"
                   onClick={deleteImage}
                 >
                   <span className="text-sm font-medium">

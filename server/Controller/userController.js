@@ -30,6 +30,7 @@ const s3 = new S3Client({
 module.exports = {
 
   updateUser: async (req, res) => {
+    console.log('req.body in updateuser', req.body)
     if (req.body.userId === req.params.id || req.body.isAdmin) {
       if (req.body.password) {
         try {
@@ -188,6 +189,11 @@ module.exports = {
 
   // delete user
   deleteUser: async (req, res) => {
+    // this req.userId is coming from the jwt verify middleware
+    // if (req.userId !== user._id.toString()) {
+    //   return res.status(403).send("you can delete only your account!")
+    // }
+
     if (req.body.userId === req.params.id || req.body.isAdmin) {
       try {
         const user = await User.findByIdAndDelete(req.params.id)

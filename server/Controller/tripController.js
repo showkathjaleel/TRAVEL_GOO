@@ -9,7 +9,6 @@ require('dotenv').config()
 const crypto = require('crypto')
 const sharp = require('sharp')
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
-const { log } = require('console')
 
 const bucketName = process.env.AWS_BUCKET_NAME
 const bucketRegion = process.env.AWS_BUCKET_REGION
@@ -26,10 +25,10 @@ const s3 = new S3Client({
 
 module.exports = {
   createTrip: async (req, res) => {
-    console.log(req.body, 'req.body')
+    // +++++++++++++++++++++++++++++++++++++
+    console.log(req.body, 'req.bodyyyyyyyyyyyyyyyyy')
 
-    console.log(req.file, 'req.file')
-
+    console.log(req.file, 'req.fileeeeeeeeeeeeeeeeee')
     // +++++++++++++++++++++++++++++++++++++
     if (req.file) {
       console.log('req.body.destinationData.tripImages il keri')

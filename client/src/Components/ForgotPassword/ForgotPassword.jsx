@@ -8,6 +8,7 @@ import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 // import { async } from '@firebase/util';
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { validateForgotPassword } from "../../Utils/helper";
 
 function ForgotPassword() {
   const [phone, setPhone] = useState("");
@@ -31,9 +32,7 @@ function ForgotPassword() {
 
   const onSignInSubmit = async (e) => {
     e.preventDefault();
-
-    setFormError(valid(phone));
-
+    setFormError(validateForgotPassword(phone));
     setIsForgot(true);
 
     // setError("")
@@ -69,17 +68,17 @@ function ForgotPassword() {
     }
   });
 
-  function valid(phone) {
-    // const phoneRegex = /^\+91\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-    const phoneRegex = /^\+91\d{12}$/;
-    const error = {};
-    if (!phone === 0) {
-      error.phone = "Phone Number is Required";
-    } else if (phoneRegex.test(phone)) {
-      error.phone = "Enter valid PhoneNumber";
-    }
-    return error;
-  }
+  // function valid(phone) {
+  //   // const phoneRegex = /^\+91\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+  //   const phoneRegex = /^\+91\d{12}$/;
+  //   const error = {};
+  //   if (!phone === 0) {
+  //     error.phone = "Phone Number is Required";
+  //   } else if (phoneRegex.test(phone)) {
+  //     error.phone = "Enter valid PhoneNumber";
+  //   }
+  //   return error;
+  // }
 
   const otpVerifier = async (e) => {
     e.preventDefault();
@@ -178,45 +177,7 @@ function ForgotPassword() {
       </section>
     </>
 
-    // <div className='grid grid-cols-1 sm:grid-cols-2 h-screen w-full'>
-    //   <div className='hidden sm:block'>
-    //     <img className='w-full h-full object-cover ' src="" alt="" />
-    //   </div>
 
-    //   <div className='bg-gray-800 flex flex-col justify-center'>
-    //     <form action="" className="max-w-[400px] w-full mx-auto bg-gray-900  p-8 px-8 rounded-lg" onSubmit={onSignInSubmit} style={{ display: !bool ? "block" : "none" }} >
-    //       <h2 className="text-4xl text-white font-bold text-center">Forgot Password</h2>
-
-    //       <div className='flex flex-col text-gray-400 py-2'>
-    //         <label htmlFor="">Phone Number</label>
-    //         <PhoneInput defaultCountry='IN'
-    //           placeholder="Enter phone number"
-    //           value={phone}
-    //           onChange={setPhone} />
-    //         <div id='recaptcha-container'></div>
-    //       </div>
-
-    //       <button className='w-full my-5 py-2 bg-teal-500 shadow-lg shadow-teal-500/50 hover:shadow-teal-500/40 text-white' type='submit'
-    //       >Send OTP</button>
-    //     </form>
-
-    //     <form action="" className="max-w-[400px] w-full mx-auto bg-gray-900  p-8 px-8 rounded-lg" onSubmit={otpVerifier} style={{ display: bool ? "block" : "none" }} >
-    //       <h2 className="text-4xl text-white font-bold text-center">OTP PAGE</h2>
-    //       <div className='flex flex-col text-gray-400 py-2'>
-    //         <label htmlFor="">Phone Number</label>
-    //         <input className='rounded-lg bg-gray-700 mt-2 p-2 focus:border-blue-500 focus:bg-gray-800 focus:outline:none'
-    //           type="number" name="otp" value={otp} placeholder="Enter Otp" onChange={(e) => {
-    //             setOtp(e.target.value)
-    //           }} />
-    //         <div id='recaptcha-container'></div>
-    //       </div>
-    //       <button className='w-full my-5 py-2 bg-teal-500 shadow-lg shadow-teal-500/50 hover:shadow-teal-500/40 text-white' type='submit'
-    //       >Verify OTP</button>
-    //     </form>
-
-    //   </div>
-
-    // </div>
   );
 }
 

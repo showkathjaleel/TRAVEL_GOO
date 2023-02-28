@@ -2,26 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 import Card from "./Card";
-import Slider from "react-slick";
-import PostCard from "./PostCard";
-
 import Avatar from "./Avatar";
 import { useContext } from "react";
 import Layout from "./Layout";
 import { AuthUser } from "../Context/AuthUser";
 // import TripMembers from "./TripMembers";
-
 import moment from "moment";
+import useFetchUser from "../Utils/useFetchUser";
+//import { initPayment } from "../Utils/useRazorpay";
 
 function TripDetails() {
   const search = useLocation().search;
   const tripId = new URLSearchParams(search).get("tripId");
   const [tourdetails, setTourDetails] = useState();
-  const [host, setHost] = useState();
   const { userAuth } = useContext(AuthUser);
   const [members, setMembers] = useState();
   const [noOfMembers, setNoOfMembers] = useState();
-  console.log(members);
 
   useEffect(() => {
     fetchTrip();
@@ -29,23 +25,16 @@ function TripDetails() {
 
   const fetchTrip = async () => {
     const res = await axios.get("/trip/getTrip/" + tripId);
-    console.log(res.data.trip, "res from fettchTrip in TripDetails");
     setTourDetails(res.data.trip);
     setMembers(res.data.trip.JoinedMembers);
+    setNoOfMembers(res.data.trip.JoinedMembers.length)
   };
 
   //  const fetchNoOfMembers=()=>{
   //     setNoOfMembers(members.length)
   //   }
 
-  // useEffect(() => {
-  //   const fetchHost = async () => {
-  //     const res = await axios.get("/api/getUser/" + tourdetails.hostId);
-  //     console.log(res, "oooooooooooooooooooooooooo");
-  //     setHost(res.data);
-  //   };
-  //   fetchHost();
-  // }, []);
+  const host=useFetchUser(tourdetails?.hostId)
 
   // const settings = {
   //   dots: true,
@@ -72,8 +61,7 @@ function TripDetails() {
         }
       )
       .then(({ data }) => {
-        console.log(data, "llllllllllllll");
-        initPayment(data.data);
+       initPayment(data.data);
       })
       .catch((err) => {
         console.log(err);
@@ -81,13 +69,13 @@ function TripDetails() {
       });
   };
 
+
+
   // --------------------------------------------------------------------------
   //payment
   const initPayment = (data) => {
+    alert('ithinakath keri')
     const RAZORPAY_KEY_ID = "rzp_test_NBKIQegHCsjMos";
-    alert("keri");
-    alert(data);
-    console.log(data, "111data in initpayment");
     var options = {
       key: RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
       amount: data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
@@ -97,14 +85,10 @@ function TripDetails() {
       image: "https://example.com/your_logo",
       order_id: data.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
       handler: async (response) => {
-        alert("keri2");
-        alert(response);
-        console.log(response, "222 response from handler in initpayment");
         try {
           const res = await axios.post("/payment/verifypayment", {
             response,
           });
-          console.log(res, "pppppppppppppp");
           if (res.data.signatureIsValid) {
             axios
               .put("/trip/enrollToTrip/" + tourdetails._id, {
@@ -140,6 +124,8 @@ function TripDetails() {
       e.preventDefault();
     };
   };
+
+
   //---------------------------------------------------------------------------
   //  const [currentIndex, setCurrentIndex] = useState(0);
   // const membersToShow = tourdetails.members.slice(currentIndex, currentIndex + 4);
@@ -151,6 +137,7 @@ function TripDetails() {
   // const handleNextClick = () => {
   //   setCurrentIndex(currentIndex + 4);
   // };
+
   return (
     <Layout>
       <div className="flex">
@@ -190,7 +177,6 @@ function TripDetails() {
                         d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
                       />
                     </svg>
-                    {/* 9 members{" "} */}
                     {noOfMembers}
                   </button>
                 </div>

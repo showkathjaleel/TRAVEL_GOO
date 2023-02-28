@@ -8,7 +8,7 @@ const PrivateRoute = () => {
   const [cookies] = useCookies();
   const { userAuth } = useContext(AuthUser);
 
-  // return cookies.jwt? <Outlet />   :  <Navigate to="/newlogin" /> ;
+  console.log('privateRoute,:',cookies?.jwt);
 
   return cookies?.jwt ? <Outlet /> : <Navigate to="/newlogin" />;
 };

@@ -9,7 +9,6 @@ export default function Header({ fixed }) {
   console.log(" from Header");
 
   const navigate = useNavigate();
-  const [cookies, removeCookie] = useCookies([]);
   const [currentuser, setCurrentuser] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [navbarOpen, setNavbarOpen] = React.useState(false);
@@ -21,10 +20,11 @@ export default function Header({ fixed }) {
     }
   }, [userAuth]);
 
-  function handleClick() {
-    removeCookie(`jwt`);
-    navigate("/newlogin");
-  }
+
+
+  const hostTrip = () => {
+    navigate("/create-event");
+  };
 
   return (
     <>
@@ -81,6 +81,15 @@ export default function Header({ fixed }) {
             </div>
 
             <ul className="flex flex-col lg:flex-row list-none lg:ml-auto">
+
+              <li>
+              <button
+                  className="cursor-pointer inline-block text-sm px-4 py-2 leading-none border rounded  border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 lg:mt-0 ml-3"
+                  onClick={hostTrip}
+                >
+                  Host a Trip
+                </button>
+              </li>
               <li className="nav-item">
                 <a
                   className="px-3 py-2 flex items-center text-xs uppercase font-bold leading-snug text-white hover:opacity-75"
@@ -101,14 +110,6 @@ export default function Header({ fixed }) {
                 </a>
               </li>
 
-              <li className="nav-item">
-                <button
-                  className="cursor-pointer inline-block text-sm px-4 py-2 leading-none border rounded  border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 lg:mt-0 ml-3"
-                  onClick={handleClick}
-                >
-                  {isLoggedIn ? "Logout" : "Login"}
-                </button>
-              </li>
             </ul>
           </div>
         </div>

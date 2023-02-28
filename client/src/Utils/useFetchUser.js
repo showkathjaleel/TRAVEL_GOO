@@ -6,16 +6,16 @@ const useFetchUser=(userId)=>{
 
     //Get data from API
     useEffect(() => {
-        fetchUser();
-      }, []);
-
-    const fetchUser = async () => {
+      const fetchUser = async () => {
         const res = await axios.get(`api/getUser/${userId}`);
-        setUser(res.data);
+        setUser(res.data);    
       };
+        fetchUser();
+      }, [userId]);
 
       //return user Data
-      return user;
+     return  user?user : null;  
+      
 }
 
 export default useFetchUser;

@@ -6,8 +6,6 @@ import { Navigate, Outlet } from "react-router-dom";
 
 function DecodeUser() {
   const { userAuth, setUserAuth } = useContext(AuthUser);
-
-  //  -----------------------------------------------------------------------------
   const [cookies] = useCookies([]);
 
   useEffect(() => {
@@ -17,8 +15,6 @@ function DecodeUser() {
       setUserAuth(decoded._doc);
     }
   }, [cookies?.jwt]);
-
-  //  -----------------------------------------------------------------------------
 
   return userAuth?.username ? <Outlet /> : <Navigate to="/newlogin" />;
 }

@@ -1,10 +1,10 @@
 import React from "react";
-import NLogin from "../Components/Login/NLogin";
+import Login from "../Components/Login/Login";
 
 function LoginPage() {
   return (
     <div>
-      <NLogin />
+      <Login />
     </div>
   );
 }

@@ -17,13 +17,13 @@ export default function Cover({url,editable,onChange}) {
     const msg="coverPicture";
     const file = ev.target.files?.[0];
     const formdata = new FormData();
-    formdata.append("image", file)
+    formdata.append("image",file)
     formdata.append("userId", userAuth._id)
     formdata.append("data",msg)
     if (file) {
       setIsUploading(true);    
       try {
-        const res = await axios.put('api/updateUser/' + userAuth._id,
+         await axios.put('api/updateUser/' + userAuth._id,
           formdata, { headers: { 'Content-Type': 'multipart/form-data' } })
           setIsUploading(false);
           if(onChange)onChange();

@@ -1,4 +1,6 @@
 const router = require('express').Router()
+
+
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
 // const { authenticateToken } = require('../middleware')
@@ -107,7 +109,6 @@ router.post('/googlesignin', async (req, res) => {
       maxAge: maxAge * 1000
     })
   }
-
   res.status(200).json({ created: true })
 })
 

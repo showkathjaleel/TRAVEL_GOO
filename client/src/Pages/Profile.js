@@ -29,6 +29,7 @@ export default function ProfilePage() {
   const search = useLocation().search;
   const userId = new URLSearchParams(search).get("userId");
   const isMyUser = userId === userAuth?._id; // ACTUAL ONE
+  console.log(profile?.ProfilePicture,'profilePicture');
 
   //  -----------------------------------------------------------------------------
 

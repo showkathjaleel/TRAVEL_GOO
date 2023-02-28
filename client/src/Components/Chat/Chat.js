@@ -95,6 +95,8 @@ function Chat() {
     getConversations();
   }, [userId]);
 
+  console.log(conversations,'conversations in chat');
+
   useEffect(() => {
     const getMessages = async () => {
       try {
@@ -125,7 +127,7 @@ function Chat() {
         <div className="ChatMenu">
           <div className="ChatMenuWrapper">
             <input placeholder="Search for friends" className="chatMenuInput" />
-            {conversations.map((c) => (
+            {conversations.map((c,index) => (
               <div onClick={() => setCurrentChat(c)}>
                 <Conversation
                   key={c._id}

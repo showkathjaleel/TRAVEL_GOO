@@ -2,13 +2,10 @@ import React, { useContext, useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth } from "../../Firebase/Firebase";
-import jwt_decode from "jwt-decode";
-import { AuthUser } from "../../Context/AuthUser";
+import { validateLogin } from "../../Utils/helper";
+import { googleSignIn } from "../../Utils/useGooglesigniin";
 
-function NLogin() {
-  const { userAuth, setUserAuth } = useContext(AuthUser);
+function Login() {
   const [values, setValues] = useState({
     email: "",
     password: "",
@@ -18,16 +15,15 @@ function NLogin() {
   const [err, setErr] = useState();
   const [formError, setFormError] = useState({});
   const [islogin, setIslogin] = useState(false);
+  const navigate = useNavigate();
 
-  //  const [googleSignIn,setAuthUser]=useUserAuth()
   const passwordView = () => {
     bool ? setBool(false) : setBool(true);
   };
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormError(validate(values));
+    setFormError(validateLogin(values));
     setIslogin(true);
   };
 
@@ -51,60 +47,28 @@ function NLogin() {
           }
         });
     }
-  }, [formError]);
+  }, [formError,islogin]);
 
-  const handleClick = () => {
-    navigate("/guidelogin");
-  };
 
-  function validate(values) {
-    const error = {};
-    const regex =
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-    if (!values.email) {
-      error.email = "Email Required!";
-    } else if (!regex.test(values.email)) {
-      error.email = "Enter a Valid Email";
-    }
-
-    if (!values.password) {
-      error.password = "Password is Required!";
-    } else if (values.password.length < 4) {
-      error.password = "Password must be more than 4 characters";
-    } else if (values.password.length > 12) {
-      error.password = "Password cannot exceed more than 12 characters";
-    }
-
-    return error;
-  }
 
   const handleGoogleSignIn = async (e) => {
     e.preventDefault();
     try {
       const res = await googleSignIn();
-      console.log("response from googleSignIn", res);
-      const userDetail = res._tokenResponse;
-      console.log(userDetail, "userDetail");
+       const userDetail = res._tokenResponse;
       const response = await axios.post("/auth/googlesignin", {
         email: userDetail.email,
         username: userDetail.fullName,
       });
 
-      console.log(response, "responseee");
-
-      // document.cookie=`jwt=${res.UserCredentialImp._tokenResponse.refreshToken}`
-
-      navigate("/");
+      //  document.cookie=`jwt=${res.UserCredentialImp._tokenResponse.refreshToken}`
+      // navigate("/");
     } catch (err) {
       setErr(err.message);
     }
   };
 
-  function googleSignIn() {
-    const googleAuthProvider = new GoogleAuthProvider();
-    return signInWithPopup(auth, googleAuthProvider);
-  }
+
 
   return (
     <>
@@ -113,7 +77,7 @@ function NLogin() {
           <div className="md:w-1/2 px-8 md:px-16">
             <h2 className="font-bold text-2xl text-[#002D74]">Login</h2>
 
-            {/* {err &&
+          {/* {err &&
                         <div  className="flex justify-between text-red-200 shadow-inner rounded p-3 bg-red-600" >
                         <p className="self-center">{err}</p>
                         <strong className="text-xl align-center cursor-pointer alert-del"
@@ -191,12 +155,6 @@ function NLogin() {
                 Login
               </button>
             </form>
-            <button
-              onClick={handleClick}
-              className="bg-red-600 border py-2 w-full rounded-xl mt-5 flex justify-center items-center text-sm hover:scale-105 duration-300 text-white"
-            >
-              Register as a Guide
-            </button>
 
             <div className="mt-6 grid grid-cols-3 items-center text-gray-400">
               <hr className="border-gray-400" />
@@ -270,4 +228,4 @@ function NLogin() {
   );
 }
 
-export default NLogin;
+export default Login;

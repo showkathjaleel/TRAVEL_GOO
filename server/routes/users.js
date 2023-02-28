@@ -1,5 +1,6 @@
 const userController = require('../Controller/userController')
 const router = require('express').Router()
+//const { verifyToken } = require('../middleware');
 
 const multer = require('multer')
 const storage = multer.memoryStorage()

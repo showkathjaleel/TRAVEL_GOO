@@ -5,22 +5,21 @@ import Dropzone from "react-dropzone";
 import { useEffect } from "react";
 import axios from "axios";
 import { AuthUser } from "../Context/AuthUser";
-import { useNavigate } from "react-router-dom";
+import Preloader from "./Preloader";
 
-function PostFormCard(props) {
+
+function PostFormCard({home}) {
   const { userAuth } = useContext(AuthUser);
   const [image, setImage] = useState();
-  const [uploading, setIsUploading] = useState();
+  const [error,setError]=useState('');
+  const [isUploading, setIsUploading] = useState();
   const [currentuser, setcurrentUser] = useState();
-  const [guide, setGuide] = useState();
-  const navigate = useNavigate();
+
   useEffect(() => {
     const getUser = async () => {
       const res = await axios.get("/api/getUser/" + userAuth._id);
-      console.log(res, "postformcaard");
-      // setcurrentUser(userAuth)
       if (res.data.isGuide) {
-        setGuide(true);
+        // setGuide(true);
       }
       setcurrentUser(res.data); //this is only to show the name of user on header
     };
@@ -30,37 +29,35 @@ function PostFormCard(props) {
   useEffect(() => {
     if (image) {
       async function createPost() {
-        const file = image;
         const formdata = new FormData();
-        formdata.append("image", file);
-        formdata.append("userId", userAuth._id);
-        if (file) {
+        formdata.append("image",image[0]);
+        formdata.append("userId",userAuth._id);
+        if (image.length>0) {
           setIsUploading(true);
 
           try {
-            const res = await axios.post("posts/createpost", formdata, {
-              headers: { "Content-Type": "multipart/form-data" },
+             await axios.post("posts/createpost", formdata, {
+              headers: { "Content-Type": "multipart/form-data" }
             });
             setImage("");
             setIsUploading(false);
-          } catch (err) {}
+           // if(onChange){onChange()}
+          } catch (err) {
+            console.log(err,'errrrrrr');
+            setError(err.msg)
+          }
         }
       }
       createPost();
     }
-  }, [image]);
+  }, [image,userAuth._id]);
 
-  // ---------------------------------------------------------------------------
-  const handleClick = () => {
-    navigate("/create-event");
-  };
 
-  // ---------------------------------------------------------------------------
+
 
   return (
     <Card>
-      {/* --------------------------------------------------------------------  */}
-      {props.home && (
+      {home && (
         <Dropzone onDrop={(acceptedFiles) => setImage(acceptedFiles)}>
           {({ getRootProps, getInputProps }) => (
             <section>
@@ -100,6 +97,7 @@ function PostFormCard(props) {
       {/* --------------------------------------------------------------------  */}
 
       <div className="flex gap-1">
+       
         <div>
           <Avatar />
         </div>
@@ -108,8 +106,14 @@ function PostFormCard(props) {
           className="grow p-3 h-14"
           placeholder={`Whats on your mind,${currentuser?.username}?`}
         />
-        {guide && <button onClick={handleClick}>Create a Trip</button>}
       </div>
+
+      {isUploading && (
+        <div>
+          <Preloader />
+        </div>
+      )}
+
       <div className="flex gap-5 items-center mt-2">
         <div>
           <button className="flex gap-1">

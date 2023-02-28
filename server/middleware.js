@@ -1,19 +1,31 @@
+module.exports.verifyToken=(req,res)=>{
+  const token=req.cookies.jwt;
+  if(!token) return res.status(401).send("you are not authenticated!")
 
-const jwt = require('jsonwebtoken')
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET,async (err, payload) => {
+    if (err) return res.status(403).send("token is not valid")
+    req.userId = payload
 
-module.exports = {
+})
+}
 
-  authenticateToken: (req, res, next) => {
-    const authHeader = req.headers.authorization
+  // -------------------------------------------------
+  // const jwt = require('jsonwebtoken')
 
-    const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.sendStatus(401)
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-      if (err) return res.sendStatus(403)
-      req.user = user
-      next()
-    })
-  }
+  // module.exports = {
+
+  //   authenticateToken: (req, res, next) => {
+  //     const authHeader = req.headers.authorization
+
+  //     const token = authHeader && authHeader.split(' ')[1]
+  //     if (token == null) return res.sendStatus(401)
+  //     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+  //       if (err) return res.sendStatus(403)
+  //       req.user = user
+  //       next()
+  //     })
+  //   }
+  // -------------------------------------------------
 
   //       const refreshToken = jwt.sign({
   //         username: userCredentials.username,
@@ -31,5 +43,4 @@ module.exports = {
   //         message: 'Invalid credentials' });
   // }
   // })
-
 }

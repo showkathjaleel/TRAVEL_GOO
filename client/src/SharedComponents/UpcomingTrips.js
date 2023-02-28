@@ -2,20 +2,21 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Layout from "./Layout";
 import { Link } from "react-router-dom";
+import useFetchUser from "../Utils/useFetchUser";
 
 function Trip({ imageUrl, trips }) {
-  const [host, setHost] = useState();
-  console.log(trips, "trips");
-  useEffect(() => {
-    if (trips) {
-      fetchHost();
-    }
-  }, []);
+  const host=useFetchUser(trips?.hostId)
 
-  const fetchHost = async () => {
-    const res = await axios.get("/api/getUser/" + trips.hostId);
-    setHost(res.data);
-  };
+  // useEffect(() => {
+  //   if (trips) {
+  //     fetchHost();
+  //   }
+  // }, []);
+  // const fetchHost = async () => {
+  //   const res = await axios.get("/api/getUser/" + trips?.hostId);
+  //   setHost(res.data);
+  // };
+  
   return (
     <>
       <Link to={`/trip-details?tripId=${trips._id}`}>
@@ -42,21 +43,21 @@ function Trip({ imageUrl, trips }) {
                 Members only
               </p>
               <div className="text-gray-900 font-bold text-xl mb-2">
-                {trips.tripData.tripName}
+                {trips?.tripData?.tripName}
               </div>
               <p className="text-gray-700 text-base">
-                {trips.tripData.tripDescription}
+                {trips?.tripData?.tripDescription}
               </p>
             </div>
             <div className="flex items-center">
               <img
                 className="w-10 h-10 rounded-full mr-4"
-                src="https://media.istockphoto.com/id/839815136/photo/tea-plantation-in-munnar-kerala.webp?s=612x612&w=is&k=20&c=XVQt3owqAzh1LseqHDoLHNABk-HvS8bRLJBCQmEQuT4="
+                src={host?.ProfilePicture ? host?.ProfilePicture:"images/images.jpeg"}
                 alt="Avatar of Jonathan Reinink"
               />
               <div className="text-sm">
                 <p className="text-gray-900 leading-none">{host?.username}</p>
-                <p className="text-gray-600">{trips.tripData.departureDate}</p>
+                <p className="text-gray-600">{trips?.tripData?.departureDate}</p>
               </div>
             </div>
           </div>
@@ -73,7 +74,6 @@ function UpcomingEvents() {
     axios
       .get("/trip/getAlltrips")
       .then((res) => {
-        console.log(res.data.trips, ";;;;;;;;;;;;;;;;;;;;;;;;;;;");
         setTrips(res.data.trips);
       })
       .catch((error) => console.log(error));

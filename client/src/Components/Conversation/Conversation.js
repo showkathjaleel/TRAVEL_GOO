@@ -5,7 +5,7 @@ import "./Conversation.css";
 function Conversation({ conversation, currentUserId }) {
   console.log(currentUserId, "from conversation");
   const [user, setUser] = useState(null); //this user means the  one who communicated with user
-  console.log(user, "sadik inte friends");
+
   useEffect(() => {
     const friendId = conversation.members.find((m) => m !== currentUserId);
     const getUser = async () => {
