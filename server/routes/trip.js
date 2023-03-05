@@ -4,7 +4,7 @@ const multer = require('multer')
 const storage = multer.memoryStorage()
 const upload = multer({ storage })
 
-router.post('/addTrip', upload.array('images', 12), tripController.createTrip)
+router.post('/addTrip', upload.array('images', 10), tripController.createTrip)
 
 router.get('/getAlltrips', tripController.getAllTrips)
 

@@ -3,62 +3,39 @@ import Card from "./Card";
 import Avatar from "./Avatar";
 import Dropzone from "react-dropzone";
 import { useEffect } from "react";
-import axios from "axios";
 import { AuthUser } from "../Context/AuthUser";
 import Preloader from "./Preloader";
+import { fetchUser } from "../api/user";
+import { createPost } from "../api/post";
 
 
 function PostFormCard({home}) {
   const { userAuth } = useContext(AuthUser);
-  const [image, setImage] = useState();
-  const [error,setError]=useState('');
   const [isUploading, setIsUploading] = useState();
   const [currentuser, setcurrentUser] = useState();
 
   useEffect(() => {
-    const getUser = async () => {
-      const res = await axios.get("/api/getUser/" + userAuth._id);
-      if (res.data.isGuide) {
-        // setGuide(true);
-      }
-      setcurrentUser(res.data); //this is only to show the name of user on header
-    };
     getUser();
-  }, [userAuth._id]); //want to use this . then only i can give name to whats on your mind
+  }, [userAuth._id]); 
 
-  useEffect(() => {
-    if (image) {
-      async function createPost() {
-        const formdata = new FormData();
-        formdata.append("image",image[0]);
-        formdata.append("userId",userAuth._id);
-        if (image.length>0) {
-          setIsUploading(true);
+const getUser=()=>{
+  fetchUser(userAuth._id).then((result)=>{
+    setcurrentUser(result)
+  })
+}
 
-          try {
-             await axios.post("posts/createpost", formdata, {
-              headers: { "Content-Type": "multipart/form-data" }
-            });
-            setImage("");
-            setIsUploading(false);
-           // if(onChange){onChange()}
-          } catch (err) {
-            console.log(err,'errrrrrr');
-            setError(err.msg)
-          }
-        }
-      }
-      createPost();
+  const postUpload=async(image)=>{
+    setIsUploading(true);
+    await createPost(image[0],userAuth._id)
+    setIsUploading(false);
     }
-  }, [image,userAuth._id]);
-
 
 
 
   return (
     <Card>
       {home && (
-        <Dropzone onDrop={(acceptedFiles) => setImage(acceptedFiles)}>
+          <Dropzone onDrop={(acceptedFiles) => postUpload(acceptedFiles)}> 
           {({ getRootProps, getInputProps }) => (
             <section>
               <div {...getRootProps()}>
@@ -99,7 +76,7 @@ function PostFormCard({home}) {
       <div className="flex gap-1">
        
         <div>
-          <Avatar />
+          <Avatar url={currentuser?.ProfilePicture || "images/images.jpeg"} />
         </div>
 
         <textarea

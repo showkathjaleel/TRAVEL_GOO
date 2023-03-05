@@ -1,12 +1,11 @@
 import React from "react";
 import Layout from "./Layout";
 import { useState, useEffect, useContext } from "react";
-import axios from "axios";
-
 import { AuthUser } from "../Context/AuthUser";
 import { useNavigate } from "react-router-dom";
 import { validate } from "../Utils/helper";
 import {validateDestination} from "../Utils/helper";
+import { createTrip } from "../api/trip";
 
 function RegisterEvent() {
   const { userAuth } = useContext(AuthUser);
@@ -22,7 +21,6 @@ function RegisterEvent() {
   const [eventDataError,setEventDataError]=useState({})
   const [isEventDataError,setIsEventDataError]=useState(false)
   const [link, setLink] = useState("");
-  const [isEvent, setIsEvent] = useState(false);
   // const [destinationDetails, setDestinationDetails] = useState({
   //   location: "",
   //   activities: "",
@@ -30,7 +28,7 @@ function RegisterEvent() {
   const [inputCount, setInputCount] = useState(1);
   const [locations, setLocations] = useState([]);
   const [tripImages, setTripImages] = useState([]);
-  const [activities, setActivities] = useState([]);
+  const [activities,setActivities] = useState([]);
   const [nextValue, setNextValue] = useState(1);
   const [destError, setDestError] = useState({});
   const [isDestError, setIsDestError]=useState(false)
@@ -42,87 +40,6 @@ function RegisterEvent() {
     totalCost: 0,
   });
 
-  useEffect(() => {
-    if ( isEvent) {
-
-      // const formdata = new FormData();
-      // tripImages.forEach(image => {
-      //   formdata.append('images', image);
-      // });
-      // formdata.append("locations", locations);
-      // formdata.append("activities", activities);
-      // formdata.append("departureDate", eventData.departureDate);
-      // formdata.append("endingDate", eventData.endingDate);
-      // formdata.append("tripName", eventData.tripName);
-      // formdata.append("tripDescription", eventData.tripDescription);
-      // formdata.append("totalMembers", eventData.totalMembers);
-      // formdata.append("accomodationCost", cost.accomodationCost);
-      // formdata.append("transportationCost", cost.transportationCost);
-      // formdata.append("otherCost", cost.otherCost);
-      // formdata.append("totalCost", cost.totalCost);
-      // formdata.append("hostId",userAuth._id,)
-      
-      // axios.post(`/trip/addTrip`, formdata, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //   },
-      //   // params: {
-      //   //   hostId: userAuth._id,
-      //   // },
-      // })
-      // .then((response) => {
-      //   navigate("/upcoming-events");
-      // })
-      // .catch((err) => {
-      //   console.log(err);
-      //   alert(err);
-      // });
-      
-
-
-
-
-      const tripData = {
-        departureDate: eventData.departureDate,
-        endingDate: eventData.endingDate,
-        tripName: eventData.tripName,
-        tripDescription: eventData.tripDescription,
-        totalMembers: eventData.totalMembers,
-      };
-
-
-
-      const destinationData = {
-        tripImages: tripImages,
-        locations: locations,
-        activities: activities,
-      };
-
-      const costData = {
-        accomodationCost: cost.accomodationCost,
-        transportationCost: cost.transportationCost,
-        otherCost: cost.otherCost,
-        totalCost: cost.totalCost,
-      };
-
-
-      axios
-        .post(`/trip/addTrip`, {
-          tripData,
-          costData,
-          destinationData,
-          hostId: userAuth._id,
-        })
-        .then((response) => {
-         navigate("/upcoming-events");
-         
-        })
-        .catch((err) => {
-          console.log(err);
-          alert(err);
-        });
-     }
-  }, [isEvent]);
 
   const handleChange = (e) => {
     const value = e.target.value;
@@ -131,14 +48,6 @@ function RegisterEvent() {
       [e.target.name]: value,
     });
   };
-
-  // const handleDestination = (e) => {
-  //   const value = e.target.value;
-  //   setDestinationDetails({
-  //     ...destinationDetails,
-  //     [e.target.name]: value,
-  //   });
-  // };
 
   const costChange = (e) => {
     const value = e.target.value;
@@ -159,12 +68,15 @@ function RegisterEvent() {
 
   const sendTripData = (e) => {
     e.preventDefault();
-    setIsEvent(true);
+    createTrip(eventData,tripImages,locations,activities,cost,userAuth._id).then((res)=>{
+      navigate("/upcoming-events");
+
+    })
   };
 
   const firstNext = (e) => {
     e.preventDefault();
-    setEventDataError(validate(eventData))
+setEventDataError(validate(eventData))
     setIsEventDataError(true)        
   };
 
@@ -190,7 +102,7 @@ function RegisterEvent() {
   //-----------------------------------------------------------------
 
   return (
-    <div>
+    <div className="pt-5">
       <Layout>
         {nextValue === 1 && 
             <form
@@ -352,17 +264,14 @@ function RegisterEvent() {
                           d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"
                         />
                       </svg>
-
+                     in
                       <input
                         type="file"
-                        //className="hidden"
                         name="images"
-                        encType="multipart/form-data"
-                        value={tripImages[index] || ""}
+                        multiple
                         onChange={(event) => {
-                          const updatedImages = [...tripImages];
-                          updatedImages[index] = event.target.value;
-                          setTripImages(updatedImages);
+                          const updatedImages = Array.from(event.target.files)
+                          setTripImages(prev=> [...prev,...updatedImages]);
                           //setFile(URL.createObjectURL(tripImages[index] || ""))
                         }}
                       />

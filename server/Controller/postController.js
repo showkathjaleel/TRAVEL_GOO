@@ -11,24 +11,11 @@ require('dotenv').config()
 const crypto = require('crypto')
 const sharp = require('sharp')
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
-const { log } = require('console')
-
-// const AWS_BUCKET_NAME='travel-goo-app-stagram'
-// const AWS_BUCKET_REGION='ap-northeast-1'
-// const AWS_ACCESS_KEY='AKIAS4IBJ2ZJQ4TZI74N'
-// const AWS_SECRET_KEY='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'
-
-// const bucketName = AWS_BUCKET_NAME
-// const bucketRegion = AWS_BUCKET_REGION
-// const accessKey = AWS_ACCESS_KEY
-// const secretAccessKey = AWS_SECRET_KEY
-// console.log(accessKey)
 
 const bucketName = process.env.AWS_BUCKET_NAME
 const bucketRegion = process.env.AWS_BUCKET_REGION
 const accessKey = process.env.AWS_ACCESS_KEY
 const secretAccessKey = process.env.AWS_SECRET_KEY
-console.log(process.env.AWS_SECRET_KEY ,'=====================================================================')
 
 const s3 = new S3Client({
   credentials: {
@@ -40,9 +27,9 @@ const s3 = new S3Client({
 
 module.exports = {
   createPost: async (req, res) => {
-    console.log('444444444444444444444444444444444444444444444444444444444');
-    console.log(req.file,'req.filewwwwwwwwwwwwwwwwwwwwwwwwww');
-    console.log(req.body,'req.body');
+    console.log('444444444444444444444444444444444444444444444444444444444')
+    console.log(req.file, 'req.filewwwwwwwwwwwwwwwwwwwwwwwwww')
+    console.log(req.body, 'req.body')
 
     // -------------------------------------------------------------------------------------------S3 BUCKET
     if (req.file) {
@@ -53,7 +40,7 @@ module.exports = {
       const buffer = await sharp(req.file.buffer)
         .resize({ height: 1920, width: 1080, fit: 'contain' })
         .toBuffer()
-        console.log(buffer,'buffer000000000000000000000000000000');
+      console.log(buffer, 'buffer000000000000000000000000000000')
       const imageName = randomImageName()
 
       const params = {
@@ -63,8 +50,8 @@ module.exports = {
         ContentType: req.file.mimetype
       }
       const command = new PutObjectCommand(params)
-      console.log(command,'command111111111111111111111111111111111111111111111111111111');
-      const response = await s3.send(command)
+      console.log(command, 'command111111111111111111111111111111111111111111111111111111')
+      await s3.send(command)
       req.body.img = imageName
     }
     // -------------------------------------------------------------------------------------------
@@ -97,24 +84,24 @@ module.exports = {
 
   deletePost: async (req, res) => {
     // try {
-      const post = await Post.findById(req.params.id)
-      console.log('respo222222')
+    const post = await Post.findById(req.params.id)
+    console.log('respo222222')
 
-      if (post.userId === req.body.userId) {
-        const params = {
-          Bucket: bucketName,
-          Key: post.img
-        }
-
-        const command = new DeleteObjectCommand(params)
-        console.log(command,'command');
-        let res = await s3.send(command);
-        console.log(res,'resssss');
-        await post.deleteOne()
-        res.status(200).json('post has been deleted')
-      } else {
-        res.status(403).json('you can delete only your post')
+    if (post.userId === req.body.userId) {
+      const params = {
+        Bucket: bucketName,
+        Key: post.img
       }
+
+      const command = new DeleteObjectCommand(params)
+      console.log(command, 'command')
+      const res = await s3.send(command)
+      console.log(res, 'resssss')
+      await post.deleteOne()
+      res.status(200).json('post has been deleted')
+    } else {
+      res.status(403).json('you can delete only your post')
+    }
     // } catch (err) {
     //   res.status(500).json(err)
     // }
@@ -157,7 +144,7 @@ module.exports = {
   getPost: async (req, res) => {
     try {
       const post = await Post.findById(req.params.id)
-      console.log(post,'post..........................');
+      console.log(post, 'post..........................')
       res.status(200).json(post)
     } catch (err) {
       res.status(500).json(err)
@@ -165,7 +152,6 @@ module.exports = {
   },
 
   timelinePost: async (req, res) => {
-    console.log('timeline post il keriiiiii')
     const postArray = []
     try {
       const currentUser = await User.findById(req.params.userId)
@@ -175,7 +161,6 @@ module.exports = {
 
       userPosts.forEach((post) => {
         if (post.img) {
-          console.log('11111111111111111111111')
           const getObjectParams = {
             Bucket: bucketName,
             Key: post.img
@@ -198,13 +183,10 @@ module.exports = {
         })
       )
 
-      console.log(Array.isArray(friendPosts))
       //  ____________________________________________________________________________________
 
       friendPosts.forEach((docArray) => {
         docArray.forEach((post) => {
-          //   console.log(doc.img)
-
           if (post.img) {
             const getObjectParams = {
               Bucket: bucketName,

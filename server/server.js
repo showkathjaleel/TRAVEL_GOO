@@ -14,6 +14,7 @@ const messageRoute = require('./routes/messages')
 const conversationRoute = require('./routes/conversations')
 const paymentRoute = require('./routes/payment')
 const tripRoute = require('./routes/trip')
+const storyRoute = require('./routes/story')
 
 dotenv.config()
 
@@ -35,6 +36,7 @@ app.use('/message', messageRoute)
 app.use('/conversation', conversationRoute)
 app.use('/payment', paymentRoute)
 app.use('/trip', tripRoute)
+app.use('/story', storyRoute)
 
 app.listen(5000, () => {
   console.log('server is listening')

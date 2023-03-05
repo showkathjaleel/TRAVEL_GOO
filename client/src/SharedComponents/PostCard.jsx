@@ -2,38 +2,47 @@ import React, { useContext, useEffect, useState } from "react";
 import Card from "./Card";
 import { Link } from "react-router-dom";
 import Avatar from "./Avatar";
-import axios from "axios";
 import { AuthUser } from "../Context/AuthUser";
 import TimeAgo from "react-timeago";
-import useFetchUser from "../Utils/useFetchUser";
-//import { postComment } from "../api/post";
+import { postComment } from "../api/post";
+import { likeHandler } from "../api/post";
+import { postDelete } from "../api/post";
+import { savePost } from "../api/post";
+import { fetchUser, followUser } from "../api/user";
+import { fetchComments } from "../api/post";
+
 
 function PostCard({ post }) {
 
   const { userAuth } = useContext(AuthUser);
   const [like, setLike] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
- // const [user, setUser] = useState({});
+  const [user, setUser] = useState({});
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
-  const [isSaved, setIsSaved] = useState(false);
-  const [isDeleted, setIsDeleted] = useState(false);
 
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const [isSaved, setIsSaved] = useState(false);
+  //const [isDeleted, setIsDeleted] = useState(false);
    // if(post.likes?.includes(userAuth._id)){
   //   setIsLiked(true)
   // }
 
-  // -------------------------fetch all the users in the posts-------------------------
-
-   const user=useFetchUser(post.userId)
  
-  // useEffect(() => {
-  //   fetchUser();
-  // }, []);
-  // const fetchUser = async () => {
-  //   const res = await axios.get(`api/getUser/${post.userId}`);
-  //   setUser(res.data);
-  // };
+  useEffect(() => {
+    getUser();
+  }, []);
+
+  const getUser=()=>{
+    fetchUser(post.userId).then((result)=>{
+      setUser(result)
+    })
+  }
+
 
   useEffect(() => {
     setIsLiked(post.likes.includes(userAuth._id));
@@ -41,88 +50,49 @@ function PostCard({ post }) {
 
 
   useEffect(() => {
-    const fetchComments = async () => {
-      const res = await axios.get(`comment/getcomments/${post._id}`);
-      setComments(res.data.comments);
-    };
-    fetchComments();
-  }, [post._id]);
+    getComments()
+  }, []);
+  
+  const getComments=()=>{
+    fetchComments(post._id).then((result)=>{
+      setComments(result)
+    })
+  }
 
-  // --------------------------------when pressing a like button-------------------------------------------------//
-
-  const likeHandler = async () => {
-    try {
-      await axios.put("posts/likePost/" + post._id, {
-        userId: userAuth._id,
-      });
+  const handleLike=()=>{
+    likeHandler(post._id,userAuth._id).then((result)=>{
       setLike(isLiked ? like - 1 : like + 1);
       setIsLiked(!isLiked);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    })
+  }
 
-  async function postComment(e) {
+ 
+  const  handleCommentSubmit= (e)=>{
     e.preventDefault();
-    try {
-      const res = await axios.post("comment/createcomment", {
-        senderId: userAuth._id,
-        postId: post._id,
-        text: commentText,
-      });
-      setComments([...comments, res.data]);
-      setCommentText("");
-    } catch (err) {
-      console.log(err);
-    }
+    postComment( user._id, post._id,commentText).then((result)=>{
+      setComments([...comments, result]);
+      setCommentText("");    
+    })
   }
 
-  // const  handleCommentSubmit= (userId=user._id, postId=post._id,commentText)=>{
-  //   postComment(userId, postId, commentText).then((result)=>{
-  //     console.log(result,'result');
-  //     setComments([...comments, result]);
-  //     setCommentText("");    
-  //   })
-  // }
+ const postDeleteHandler=()=>{
+  postDelete(post._id, post.userId).then((response)=>{
+    console.log(response);
+  })
+ }
+     
 
-  function postDelete() {
-    //if i want to make sure that the user is the owner of the id from from front end itself i can give currentuser._id
-    axios
-      .post("/posts/deletePost/" + post._id, {
-        userId: post.userId,
-      })
-      .then((response) => {
-        console.log(response);
-      })
-      .catch((err) => {
-        console.log(err,'err from postdelete in postcard')
-      });
+  const savePostHandler=()=>{
+    savePost(post._id,userAuth._id).then((response)=>{
+      setIsSaved(true);
+      setIsOpen(false)
+    })
   }
 
-  function toggleSave() {  //function to save the post
-    axios
-      .post("/posts/save/" + post._id, {
-        userId: userAuth._id,
-      })
-      .then((response) => {
-        setIsSaved(true);
-      })
-      .catch((err)=>{
-        console.log(err,'err from postsave in postcard')
-      })
+  const followHandler=async()=>{
+   await followUser(post.userId,userAuth._id)
+   getUser()
   }
-
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const followHandler = async () => {
-    await axios.put("/api/followUser/" + post.userId, {
-      currentuser: userAuth._id, //ith thalkkalam comment cheythekkan.After review you have to uncomment this
-    });
-  
-  };
 
   return (
     <Card>
@@ -186,7 +156,7 @@ function PostCard({ post }) {
           <div className="relative">
             {isOpen && (
               <div className="absolute -right-6 bg-white shadow-md shadow-gray-300 p-3 rounded-sm border border-gray-100 w-52">
-                <button onClick={toggleSave} className="w-full -my-2">
+                <button onClick={savePostHandler} className="w-full -my-2">
                   <span className="flex -mx-4 hover:shadow-md gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white px-4 rounded-md transition-all hover:scale-110 shadow-gray-300">
                     {isSaved && (
                       <svg
@@ -265,7 +235,7 @@ function PostCard({ post }) {
                 </span>
 
                 <button
-                  onClick={postDelete}
+                  onClick={postDeleteHandler}
                   className="flex gap-3 py-2 my-2 hover:bg-socialBlue hover:text-white -mx-4 px-4 rounded-md transition-all hover:scale-110 hover:shadow-md"
                 >
                   <svg
@@ -329,7 +299,7 @@ function PostCard({ post }) {
       </div>
 
       <div className="mt-5 flex gap-8">
-        <button className="flex gap-2 items-center" onClick={likeHandler}>
+        <button className="flex gap-2 items-center" onClick={handleLike}>
           {like ? (
             <svg width="24" height="24" viewBox="0 0 24 24">
               <path
@@ -391,8 +361,8 @@ function PostCard({ post }) {
         </div>
 
         <div className="border grow rounded-full relative inline-flex">
-        <form onSubmit={postComment}> 
-        {/* <form onSubmit={handleCommentSubmit}> */}
+        {/* <form onSubmit={postComment}>  */}
+        <form onSubmit={handleCommentSubmit}>
             <input
               value={commentText}
               onChange={(ev) => setCommentText(ev.target.value)}
@@ -437,7 +407,7 @@ function PostCard({ post }) {
       </div>
 
       <div className="comments">
-        {comments.map((comment) => {
+        {comments?.map((comment) => {
           return (
             <div className="comment" key={comment._id}>
               <p>{comment.text}</p>

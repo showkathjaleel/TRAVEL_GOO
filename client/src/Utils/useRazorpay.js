@@ -1,13 +1,7 @@
 
 
 import axios from "axios";
-// import { useState } from "react";
-// const useRazorpay = (order) => {
-//   console.log(order,'order11111111');
-//   const [paymentError, setPaymentError] = useState(null);
-
 export const initPayment = async (order) => {
-    console.log(order,'order2222222');
     const RAZORPAY_KEY_ID = "rzp_test_NBKIQegHCsjMos";
 
     const options = {
@@ -24,8 +18,6 @@ export const initPayment = async (order) => {
       },
       handler: async (response) => {
 
-        alert('response il keriiiiiiiii')
-        let res={};
         try {
           const paymentId = response.razorpay_payment_id;
           const signature = response.razorpay_signature;
@@ -36,21 +28,18 @@ export const initPayment = async (order) => {
             signature,
             orderId,
           });
-
-          if (verifyPaymentResponse.data.signatureIsValid) {
-
-            // Payment successful, perform necessary actions
-            // res.paymentStatus=true;
-            // res.error='';
-            return "payment-success";
-          } else {
-
-            // Payment signature invalid
-           // setPaymentError("Payment signature invalid");
-           return "payment-failed";
-          }
+          console.log(verifyPaymentResponse, 'verifyPaymentResponseeee');
+          return verifyPaymentResponse;
+                
+          // if (verifyPaymentResponse.data.signatureIsValid) {
+          //   // Payment successful, perform necessary actions
+          // } else {
+          //   // Payment signature invalid
+          //  // setPaymentError("Payment signature invalid")
+          // }
         } catch (error) {
           //setPaymentError("Error verifying payment");
+
         }
       },
       notes: {
@@ -65,9 +54,7 @@ export const initPayment = async (order) => {
     rzp1.open();
   };
 
-//   return { initPayment, paymentError };
-// };
-// export default useRazorpay;
+
 
 // ------------------------------------------------------------------//
 

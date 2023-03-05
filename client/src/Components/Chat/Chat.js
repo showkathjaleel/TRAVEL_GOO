@@ -114,12 +114,14 @@ function Chat() {
   }, [messages]);
 
   const handleVideoButton = () => {
-    setBool(true);
+    // setBool(true);
+    navigate('/room');
   };
 
   const handleJoinRoom = useCallback(() => {
-    navigate(`/room/${roomNumber}`);
-  }, [navigate, roomNumber]);
+    // navigate(`/room/${roomNumber}`);
+    navigate('/room');
+  }, []);
 
   return (
     <>
@@ -128,9 +130,9 @@ function Chat() {
           <div className="ChatMenuWrapper">
             <input placeholder="Search for friends" className="chatMenuInput" />
             {conversations.map((c,index) => (
-              <div onClick={() => setCurrentChat(c)}>
+              <div  key={c._id} onClick={() => setCurrentChat(c)}>
                 <Conversation
-                  key={c._id}
+                  // key={c._id}
                   conversation={c}
                   currentUserId={userId}
                 />

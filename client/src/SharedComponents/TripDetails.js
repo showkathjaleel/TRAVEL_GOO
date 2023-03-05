@@ -9,7 +9,7 @@ import { AuthUser } from "../Context/AuthUser";
 // import TripMembers from "./TripMembers";
 import moment from "moment";
 import useFetchUser from "../Utils/useFetchUser";
-//import { initPayment } from "../Utils/useRazorpay";
+import { initPayment } from "../Utils/useRazorpay";
 
 function TripDetails() {
   const search = useLocation().search;
@@ -18,6 +18,8 @@ function TripDetails() {
   const { userAuth } = useContext(AuthUser);
   const [members, setMembers] = useState();
   const [noOfMembers, setNoOfMembers] = useState();
+  const [tripImages,setTripImages]= useState()
+
 
   useEffect(() => {
     fetchTrip();
@@ -28,22 +30,11 @@ function TripDetails() {
     setTourDetails(res.data.trip);
     setMembers(res.data.trip.JoinedMembers);
     setNoOfMembers(res.data.trip.JoinedMembers.length)
+    setTripImages(res.data.trip.destinationData.tripImages)
   };
-
-  //  const fetchNoOfMembers=()=>{
-  //     setNoOfMembers(members.length)
-  //   }
+  
 
   const host=useFetchUser(tourdetails?.hostId)
-
-  // const settings = {
-  //   dots: true,
-  //   infinite: true,
-  //   speed: 500,
-  //   slidesToShow: 1,
-  //   slidesToScroll: 1,
-  //   className: "slider-images",
-  // };
 
   const departureDate = tourdetails?.tripData?.departureDate;
   const formattedDepartureDate = moment(departureDate).format("YYYY-MM-DD");
@@ -61,7 +52,8 @@ function TripDetails() {
         }
       )
       .then(({ data }) => {
-       initPayment(data.data);
+        Razorpay(data.data)
+      // initPayment(data.data);
       })
       .catch((err) => {
         console.log(err);
@@ -69,61 +61,85 @@ function TripDetails() {
       });
   };
 
+ const  Razorpay=(data)=>{
+  initPayment(data).then((verifyPaymentResponse)=>{
+    console.log(verifyPaymentResponse,'responseddddddddddddddd');
+     if (verifyPaymentResponse.data.signatureIsValid) {
+            // Payment successful, perform necessary actions
+            console.log('payment-sucesssssssss');
+            axios.put("/trip/enrollToTrip/" + tourdetails._id, {
+                          userId: userAuth._id,
+                        })
+                        .then((response) => {
+                          fetchTrip();
+                        })
+                        .catch((err) => {
 
+                        });
+
+          } else {
+            // Payment signature invalid
+           // setPaymentError("Payment signature invalid");
+
+          }
+
+  })
+
+ }
 
   // --------------------------------------------------------------------------
   //payment
-  const initPayment = (data) => {
-    alert('ithinakath keri')
-    const RAZORPAY_KEY_ID = "rzp_test_NBKIQegHCsjMos";
-    var options = {
-      key: RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
-      amount: data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-      currency: "INR",
-      name: "Acme Corp",
-      description: "Test Transaction",
-      image: "https://example.com/your_logo",
-      order_id: data.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-      handler: async (response) => {
-        try {
-          const res = await axios.post("/payment/verifypayment", {
-            response,
-          });
-          if (res.data.signatureIsValid) {
-            axios
-              .put("/trip/enrollToTrip/" + tourdetails._id, {
-                userId: userAuth._id,
-              })
-              .then((response) => {
-                fetchTrip();
-              })
-              .catch((err) => {});
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      },
+  // const initPayment = (data) => {
+  //   alert('ithinakath keri')
+  //   const RAZORPAY_KEY_ID = "rzp_test_NBKIQegHCsjMos";
+  //   var options = {
+  //     key: RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
+  //     amount: data.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+  //     currency: "INR",
+  //     name: "Acme Corp",
+  //     description: "Test Transaction",
+  //     image: "https://example.com/your_logo",
+  //     order_id: data.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+  //     handler: async (response) => {
+  //       try {
+  //         const res = await axios.post("/payment/verifypayment", {
+  //           response,
+  //         });
+  //         if (res.data.signatureIsValid) {
+  //           axios
+  //             .put("/trip/enrollToTrip/" + tourdetails._id, {
+  //               userId: userAuth._id,
+  //             })
+  //             .then((response) => {
+  //               fetchTrip();
+  //             })
+  //             .catch((err) => {});
+  //         }
+  //       } catch (err) {
+  //         console.log(err);
+  //       }
+  //     },
 
-      prefill: {
-        name: "Gaurav Kumar",
-        email: "gaurav.kumar@example.com",
-        contact: "9999999999",
-      },
-      notes: {
-        address: "Razorpay Corporate Office",
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-    var rzp1 = new window.Razorpay(options);
-    rzp1.open();
-    rzp1.on("payment.failed", function (response) {});
-    document.getElementById("rzp-button1").onclick = function (e) {
-      rzp1.open();
-      e.preventDefault();
-    };
-  };
+  //     prefill: {
+  //       name: "Gaurav Kumar",
+  //       email: "gaurav.kumar@example.com",
+  //       contact: "9999999999",
+  //     },
+  //     notes: {
+  //       address: "Razorpay Corporate Office",
+  //     },
+  //     theme: {
+  //       color: "#3399cc",
+  //     },
+  //   };
+  //   var rzp1 = new window.Razorpay(options);
+  //   rzp1.open();
+  //   rzp1.on("payment.failed", function (response) {});
+  //   document.getElementById("rzp-button1").onclick = function (e) {
+  //     rzp1.open();
+  //     e.preventDefault();
+  //   };
+  // };
 
 
   //---------------------------------------------------------------------------
@@ -301,10 +317,16 @@ function TripDetails() {
         ))}
       </Slider> */}
             <h2>Tour Details</h2>
-            <div className="flex">
-              {tourdetails?.destinationData.locations.map((location, index) => (
-                <TripDetailCard key={index} locations={location} />
-              ))}
+            <div >
+
+
+              {/* {tourdetails?.destinationData?.locations?.map((location, index) => ( */}
+                {tripImages?.map((image, index) => (
+                  // {tourdetails?.destinationData?.activities?.map((activity, index) => (
+                <TripDetailCard key={index} locations={tourdetails?.destinationData?.locations?.filter((location, locationIndex) => locationIndex===index)} activities={tourdetails?.destinationData?.activities?.filter((activity, activityIndex) =>activityIndex===index)} images={image} />
+                
+          ))}
+
             </div>
           </Card>
         </div>
@@ -404,17 +426,18 @@ function TripMembers({ members }) {
   );
 }
 
-function TripDetailCard({ locations }) {
-  console.log(locations, "lllllllllllllll");
+function TripDetailCard({images,locations, activities}) {
+  console.log('images',images);
 
   return (
     <Card>
       <div>
+        <p className="my-2 text-sm">Day </p>
         <p className="my-2 text-sm">{locations}</p>
-
+        <p className="my-2 text-sm">{activities}</p>
         <div className="rounded-md overflow-hidden">
           <img
-            src="https://cdn.pixabay.com/photo/2018/02/02/13/37/nature-3125452_960_720.jpg"
+          src={images}
             alt=""
           />
         </div>

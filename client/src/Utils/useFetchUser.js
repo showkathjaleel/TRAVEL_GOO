@@ -3,7 +3,7 @@ import { useState,useEffect } from "react";
 
 const useFetchUser=(userId)=>{
      const [user,setUser]=useState(null);
-
+ 
     //Get data from API
     useEffect(() => {
       const fetchUser = async () => {

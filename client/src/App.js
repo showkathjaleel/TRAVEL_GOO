@@ -14,18 +14,17 @@ import "react-toastify/dist/ReactToastify.css";
 import DecodeUser from "./SharedComponents/DecodeUser";
 import SavedPosts from "./Pages/SavedPosts";
 import GuideLoginPage from "./Pages/GuideLoginPage";
-import RegisterEvent from "./SharedComponents/RegisterEvent";
-//import Chat from "./Components/Chat/Chat";
-// import ProfilePage from "./Pages/Profile";
-//import UpcomingEvents from "./SharedComponents/UpcomingTrips";
+import RegisterEventPage from "./Pages/RegisterEventPage";
+// import RegisterEvent from "./SharedComponents/RegisterEvent";
 import TripDetails from "./SharedComponents/TripDetails";
-// import Room from "./Components/Room/Room";//because zegocloud plan is finished
+import Room from './Components/Room/Room'
 
 
 //lazy loading
 const UpcomingEvents=lazy(()=>import("./SharedComponents/UpcomingTrips")) ;
 const Chat=lazy(()=>import("./Components/Chat/Chat"))
 const ProfilePage=lazy(()=>import("./Pages/Profile"))
+// const Room=lazy(()=>import("./Components/Room/Room"))
 
 function App() {
   return (
@@ -41,10 +40,10 @@ function App() {
               <Route path="/profile/*" element={<Suspense fallback='Loading...'> <ProfilePage /></Suspense>} />
               <Route path="/chat" element={<Suspense fallback='Loading...'><Chat /></Suspense>} />
               <Route path="/saved" element={<SavedPosts />} />              
-              <Route path="/create-event" element={<RegisterEvent />} />      
+              <Route path="/create-event" element={<RegisterEventPage />} />      
               <Route path="/upcoming-events" element={<Suspense fallback='Loading...'> <UpcomingEvents/></Suspense>}/>             
               <Route path="/trip-details" element={<TripDetails/>} />
-              {/* <Route path="/room/:roomId" element={<Room/>} /> */}
+              <Route path="/room" element={<Room/>} />
               
             </Route>
 

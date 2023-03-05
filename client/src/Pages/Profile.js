@@ -8,6 +8,8 @@ import { AuthUser } from "../Context/AuthUser";
 import ProfileContent from "../SharedComponents/ProfileContent";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
+import { fetchUser } from "../api/user";
+import { updateUser } from "../api/user";
 
 export default function ProfilePage() {
   console.log("profilepage");
@@ -50,32 +52,31 @@ export default function ProfilePage() {
       return;
     }
 
-    // const fetchUser=async()=>{
-    //   const res=await axios.get(`api/getUser/${userId}`)
-    //   setProfile(res.data)
-    // };
-    fetchUser();
+    getUser();
   }, [boolean]);
 
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(`/api/getUser/${userId}`);
-      console.log(res, "res from profile");
-      setProfile(res.data);
-    } catch (err) {}
+  const getUser = async () => {
+    fetchUser(userId).then((result)=>{
+       setProfile(result)
+    })
   };
 
-  const saveProfile = async () => {
-    try {
-      const res = await axios.put("api/updateUser/" + profile._id, {
-        username: name,
-        city: place,
-        userId,
-      });
-      setBoolean(true);
-      setEditMode(false);
-      //  setcurrentUser(prev => ({...prev,name,place}))
-    } catch (err) {}
+  const saveProfile =  () => {
+    updateUser(profile._id,name,place,userId).then((result)=>{
+        setBoolean(true);
+        setEditMode(false);
+
+    })
+    // try {
+    //   const res = await axios.put("api/updateUser/" + profile._id, {
+    //     username: name,
+    //     city: place,
+    //     userId,
+    //   });
+    //   setBoolean(true);
+    //   setEditMode(false);
+    //   //  setcurrentUser(prev => ({...prev,name,place}))
+    // } catch (err) {}
   };
 
   //  const followHandler=async( )=>{

@@ -16,8 +16,10 @@ function Avatar({ size, editable, url, onChange }) {
   const [Isdeleted, setIsDeleted] = useState(false);
 
   let width = "w-12";
+  let height="h-12"
   if (size === "lg") {
     width = "w-24 md:w-36";
+    height= "h-24 md:w-36";
   }
 
   function handleClick() {
@@ -104,9 +106,9 @@ function Avatar({ size, editable, url, onChange }) {
   }
 
   return (
-    <div className={`${width} relative`}>
+    <div className={`${width} ${height} relative`}>
       <div className="rounded-full overflow-hidden">
-        <img src={url} alt="" className="w-full" onClick={handleClick} />
+        <img src={url} alt="" className={`${width} ${height} relative`} onClick={handleClick} />
       </div>
 
       {showModal && (

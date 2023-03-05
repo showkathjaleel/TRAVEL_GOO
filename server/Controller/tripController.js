@@ -9,7 +9,8 @@ require('dotenv').config()
 const crypto = require('crypto')
 const sharp = require('sharp')
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
-
+const { getImagesfromS3 } = require('../tools/s3')
+const { log } = require('console')
 const bucketName = process.env.AWS_BUCKET_NAME
 const bucketRegion = process.env.AWS_BUCKET_REGION
 const accessKey = process.env.AWS_ACCESS_KEY
@@ -25,59 +26,132 @@ const s3 = new S3Client({
 
 module.exports = {
   createTrip: async (req, res) => {
+    const { locations, activities, departureDate, endingDate, tripName, tripDescription, totalMembers, accomodationCost, transportationCost, otherCost, totalCost, hostId } = req.body
+    console.log(activities, 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    const tripImage = []
+    const places = []
+    const activity = []
     // +++++++++++++++++++++++++++++++++++++
-    console.log(req.body, 'req.bodyyyyyyyyyyyyyyyyy')
-
-    console.log(req.file, 'req.fileeeeeeeeeeeeeeeeee')
-    // +++++++++++++++++++++++++++++++++++++
-    if (req.file) {
+    if (req.files) {
+      let index = -1
       console.log('req.body.destinationData.tripImages il keri')
-      const file = req.file
+      const files = req.files
+      for (const file of files) {
+        index++
+        const randomImageName = (bytes = 32) =>
+          crypto.randomBytes(bytes).toString('hex')
+        const buffer = await sharp(file.buffer)
+          .resize({ height: 1920, width: 1080, fit: 'contain' })
+          .toBuffer()
+        console.log(buffer, 'bufferrrr')
+        const imageName = randomImageName()
 
-      const randomImageName = (bytes = 32) =>
-        crypto.randomBytes(bytes).toString('hex')
-      const buffer = await sharp(file.buffer)
-        .resize({ height: 1920, width: 1080, fit: 'contain' })
-        .toBuffer()
-      console.log(buffer, 'bufferrrr')
-      const imageName = randomImageName()
-
-      const params = {
-        Bucket: bucketName,
-        Key: imageName,
-        Body: buffer,
-        ContentType: file.mimetype
+        const params = {
+          Bucket: bucketName,
+          Key: imageName,
+          Body: buffer,
+          ContentType: file.mimetype
+        }
+        console.log(params)
+        const command = new PutObjectCommand(params)
+        console.log(command)
+        await s3.send(command)
+        console.log('imageName', imageName)
+        tripImage[index] = imageName
+        places[index] = locations
+        activity[index] = activities
       }
-      console.log(params)
-      const command = new PutObjectCommand(params)
-      console.log(command)
-      await s3.send(command)
-      req.body.destinationData.tripImages = imageName
     }
+    console.log(places, 'tripImagessssssssssssssssss')
     // +++++++++++++++++++++++++++++++++++++
+    const obj = {
+      tripData: {
+        departureDate,
+        endingDate,
+        tripName,
+        tripDescription,
+        totalMembers
+      },
 
-    const newTrip = new Trip(req.body)
-    // try {
-    const savedTrip = await newTrip.save()
-    res.status(200).json(savedTrip)
-    // } catch (err) {
-    //   res.status(500).json(err)
-    // }
+      destinationData: {
+        tripImages: tripImage,
+        locations: places,
+        activities: activity
+      },
+
+      costData: {
+        accomodationCost,
+        transportationCost,
+        otherCost,
+        totalCost
+      },
+
+      hostId
+    }
+
+    const newTrip = new Trip(obj)
+    try {
+      const savedTrip = await newTrip.save()
+      res.status(200).json(savedTrip)
+    } catch (err) {
+      res.status(500).json(err)
+    }
   },
 
   getAllTrips: async (req, res) => {
-    console.log('**********')
-    console.log('**********')
     const trips = await Trip.find({})
+
+    function processTripImages (trips) {
+      return new Promise((resolve, reject) => {
+        const promises = []
+
+        for (const trip of trips) {
+          const tripPromises = trip.destinationData.tripImages.map((img, idx) => {
+            return getImagesfromS3(img).then((resultUrl) => {
+              trip.destinationData.tripImages[idx] = resultUrl
+            })
+          })
+
+          promises.push(Promise.all(tripPromises))
+        }
+
+        Promise.all(promises)
+          .then(() => {
+            resolve(trips)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+    }
+    await processTripImages(trips)
+    console.log(trips, 'tripsuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu')
     res.status(200).json({ trips })
     // console.log();
   },
 
+  // -----------------------------------------------------------------------//
   getTrip: async (req, res) => {
-    console.log('get a trip il keri')
-    console.log(req.params.tripId, 'eq.params.tripI')
     const trip = await Trip.findById(req.params.tripId)
-    console.log(trip, 'tripeeee')
+
+    function processTripImages (trip) {
+      return new Promise((resolve, reject) => {
+        const promises = trip.destinationData.tripImages.map((img, idx) => {
+          return getImagesfromS3(img).then((resultUrl) => {
+            trip.destinationData.tripImages[idx] = resultUrl
+          })
+        })
+
+        Promise.all(promises)
+          .then(() => {
+            resolve(trip)
+          })
+          .catch((err) => {
+            reject(err)
+          })
+      })
+    }
+    await processTripImages(trip)
     res.status(200).json({ trip })
   },
 
@@ -100,5 +174,3 @@ module.exports = {
   }
 
 }
-
-//

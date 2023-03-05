@@ -3,32 +3,26 @@ import axios from "axios";
 import Layout from "./Layout";
 import { Link } from "react-router-dom";
 import useFetchUser from "../Utils/useFetchUser";
+import moment from "moment";
 
-function Trip({ imageUrl, trips }) {
+function Trip({ trips }) {
   const host=useFetchUser(trips?.hostId)
+  const departureDate = trips?.tripData?.departureDate;
+  const formattedDepartureDate = moment(departureDate).format("YYYY-MM-DD");
+  console.log(trips,'imgggggggggggggggg');
 
   // useEffect(() => {
   //   if (trips) {
   //     fetchHost();
   //   }
   // }, []);
-  // const fetchHost = async () => {
-  //   const res = await axios.get("/api/getUser/" + trips?.hostId);
-  //   setHost(res.data);
-  // };
-  
+ 
   return (
     <>
       <Link to={`/trip-details?tripId=${trips._id}`}>
         <div className="max-w-sm w-full lg:max-w-full lg:flex">
-          <div
-            className="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden"
-            style={{
-              backgroundImage:
-                'url("https://media.istockphoto.com/id/1343811713/photo/tea-fields-in-kerala-india.jpg?b=1&s=170667a&w=0&k=20&c=InM1ODFV99yEQ0Ia1KWOOCkF6BboA93gC8GHdux4jHQ=")',
-            }}
-            title="Woman holding a mug"
-          ></div>
+         <img src={trips.destinationData.tripImages[0]}  className="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden" alt="" />
+         
 
           <div className="border-r border-b border-l border-gray-400 lg:border-l-0 lg:border-t lg:border-gray-400 bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
             <div className="mb-8">
@@ -40,7 +34,7 @@ function Trip({ imageUrl, trips }) {
                 >
                   <path d="M4 8V6a6 6 0 1 1 12 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-8c0-1.1.9-2 2-2h1zm5 6.73V17h2v-2.27a2 2 0 1 0-2 0zM7 6v2h6V6a3 3 0 0 0-6 0z" />
                 </svg>
-                Members only
+              9  Members only
               </p>
               <div className="text-gray-900 font-bold text-xl mb-2">
                 {trips?.tripData?.tripName}
@@ -57,7 +51,7 @@ function Trip({ imageUrl, trips }) {
               />
               <div className="text-sm">
                 <p className="text-gray-900 leading-none">{host?.username}</p>
-                <p className="text-gray-600">{trips?.tripData?.departureDate}</p>
+                <p className="text-gray-600">{formattedDepartureDate}</p>
               </div>
             </div>
           </div>
@@ -75,9 +69,11 @@ function UpcomingEvents() {
       .get("/trip/getAlltrips")
       .then((res) => {
         setTrips(res.data.trips);
+
       })
       .catch((error) => console.log(error));
   }, []);
+
 
   return (
     <Layout>
@@ -85,7 +81,7 @@ function UpcomingEvents() {
         {trips.map((trip) => (
           <Trip
             key={trip._id}
-            //   imageUrl={trip.imageUrl}
+           //imageUrl={tripImg}
             trips={trip}
           />
         ))}
