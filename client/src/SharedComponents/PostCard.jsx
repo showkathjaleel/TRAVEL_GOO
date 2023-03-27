@@ -12,7 +12,7 @@ import { fetchUser, followUser } from "../api/user";
 import { fetchComments } from "../api/post";
 
 
-function PostCard({ post }) {
+function PostCard({ post,userId ,socket }) {
 
   const { userAuth } = useContext(AuthUser);
   const [like, setLike] = useState(post.likes.length);
@@ -63,6 +63,12 @@ function PostCard({ post }) {
     likeHandler(post._id,userAuth._id).then((result)=>{
       setLike(isLiked ? like - 1 : like + 1);
       setIsLiked(!isLiked);
+
+      socket.emit("sendNotification", {
+        senderId: userId,
+        recieverId: post.userId,
+        type:1
+      });
     })
   }
 
@@ -130,8 +136,9 @@ function PostCard({ post }) {
       ) : (
         <button
         onClick={followHandler}
-        className="cursor-pointer inline-block text-sm px-4 py-2 leading-none border rounded  border-white hover:border-transparent hover:text-blue-500 hover:bg-white mt-4 lg:mt-0 ml-3"
+        className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
       >
+
         {user?.followers?.includes(userAuth._id) ? "following" : "follow"}
       </button>
       )}        
@@ -285,7 +292,8 @@ function PostCard({ post }) {
 
         <div className="rounded-md overflow-hidden">
           {/* <Link to={`/profile?userId=${user._id}`}> */}
-          <img 
+          <img
+         
             // src="https://cdn.pixabay.com/photo/2018/02/02/13/37/nature-3125452_960_720.jpg" alt="" />
             src={
               post.img
@@ -357,18 +365,23 @@ function PostCard({ post }) {
 
       <div className="flex mt-4 gap-3">
         <div>
-          <Avatar />
+          <Avatar url={user.ProfilePicture || "images/imgages.jpeg"}/>
         </div>
 
-        <div className="border grow rounded-full relative inline-flex">
-        {/* <form onSubmit={postComment}>  */}
+        {/* <div className="border grow rounded-full
+         relative inline-flex"> */}
+             <div className='border grow rounded-full p-1'>
+       
         <form onSubmit={handleCommentSubmit}>
-            <input
+     
+                    <textarea className='block w-full  p-3 px-4  overflow-hidden h-12 rounded-full'  value={commentText} onChange={(ev) => setCommentText(ev.target.value)} placeholder='Leave a comment'></textarea>
+                {/* </div> */}
+            {/* <input
               value={commentText}
               onChange={(ev) => setCommentText(ev.target.value)}
               className="block w-full p-3 px-4 overflow-hidden h-12 rounded-full"
               placeholder="Leave a comment"
-            />
+            /> */}
             <button type="submit">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

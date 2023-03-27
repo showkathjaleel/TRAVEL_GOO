@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import "./Conversation.css";
 
 function Conversation({ conversation, currentUserId }) {
-  console.log(currentUserId, "from conversation");
   const [user, setUser] = useState(null); //this user means the  one who communicated with user
 
   useEffect(() => {
@@ -25,6 +24,7 @@ function Conversation({ conversation, currentUserId }) {
         <img
           className="conversationImg"
           src={user.ProfilePicture ? user.ProfilePicture : "images/images.jpeg"}
+          alt=""
         />
       )}
 

@@ -7,9 +7,10 @@ import { AuthUser } from "../Context/AuthUser";
 import Preloader from "./Preloader";
 import { fetchUser } from "../api/user";
 import { createPost } from "../api/post";
+import { validateFileType } from "../Utils/helper";
 
 
-function PostFormCard({home}) {
+function PostFormCard({home,onChange}) {
   const { userAuth } = useContext(AuthUser);
   const [isUploading, setIsUploading] = useState();
   const [currentuser, setcurrentUser] = useState();
@@ -25,9 +26,19 @@ const getUser=()=>{
 }
 
   const postUpload=async(image)=>{
+     const validFileType=validateFileType(image[0])
+    //validFileType returns true or false
+    if (validFileType){
     setIsUploading(true);
     await createPost(image[0],userAuth._id)
     setIsUploading(false);
+    if(onChange){
+      onChange();
+    }
+  }
+  // else{
+  //   setFileErr('Invalid file type. Only images with jpg, jpeg, png, or gif extensions are allowed')
+  // }
     }
 
 
@@ -158,9 +169,9 @@ const getUser=()=>{
         </div>
 
         <div className="grow text-right">
-          <button className="bg-socialBlue text-white px-6 py-1 rounded-md">
+          {/* <button className="bg-socialBlue text-white px-6 py-1 rounded-md">
             Share
-          </button>
+          </button> */}
         </div>
       </div>
     </Card>

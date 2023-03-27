@@ -5,9 +5,6 @@ import { useCookies } from "react-cookie";
 const ProtectedRoute = () => {
   
   const [cookies] = useCookies([]);
-  console.log("this is protttttttttttttttttttttttttttected Route:",cookies.jwt);
-
-  // return userAuth.accessToken ? <Navigate to="/" />   :  <Outlet /> ;
 
   return cookies.jwt ? <Navigate to="/" /> : <Outlet />;
 };

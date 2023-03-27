@@ -17,12 +17,17 @@ router.post('/guideregister', async (req, res) => {
       receipt: crypto.randomBytes(10).toString('hex')
     }
 
-    instance.orders.create(options, function (err, order) {
-      if (err) {
-        return res.status(500).json({ message: 'something went wrong!' })
-      }
-      res.status(200).json({ data: order })
-    })
+    // instance.orders.create(options, function (err, order) {
+    //   if (err) {
+    //     return res.status(500).json({ message: 'something went wrong!' })
+    //   }
+    //   res.status(200).json({ data: order })
+    // })
+
+    const data = await instance.orders.create(options)
+    if (data) {
+      res.status(200).json({ data })
+    }
   } catch (err) {
     console.log(err)
     res.status(500).json({ message: 'internal server Error!' })

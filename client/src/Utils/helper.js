@@ -1,29 +1,32 @@
+
+ 
  export const  validate=(eventData) =>{
+  const err="This field is required"
     
     const error = {};
 
     if (!eventData.departureDate) {
-      error.departureDate = "departureDate is Required";
+      error.departureDate = err;
     }
 
     if (!eventData.endingDate) {
-      error.endingDate = "endingDate is Required";
+      error.endingDate = err;
     }
 
     if (!eventData.tripName) {
-      error.tripName = "tripName Required!";
+      error.tripName = err;
     } else if (eventData.tripName.length < 15) {
       error.tripName = "tripName must be more than 15 characters";
     }
 
     if (!eventData.tripDescription) {
-      error.tripDescription = "tripDescription is Required!";
+      error.tripDescription = err;
     } else if (eventData.tripDescription.length < 50) {
       error.tripDescription =
         "tripDescription must be more than 50 characters";
     }
     if (!eventData.tripSnippet) {
-      error.tripSnippet = "tripSnippet is Required!";
+      error.tripSnippet = err;
     } else if (eventData.tripSnippet.length < 60) {
       error.tripSnippet = "tripSnippet must be more than 60 characters";
     }
@@ -34,18 +37,16 @@
 
 
   export const validateDestination=(locations, activities, inputCount) =>{
-    console.log(locations,'locations',activities,'activities',inputCount,'inputCount');
-    console.log('validatttttttt');
+    const err="This field is required"
     const error = {};
 
     if (locations.length !== inputCount) {
-      error.locations = "locations is Required";
+      error.locations = err;
     }
 
     if (activities.length !== inputCount) {
-      error.activities = "activities is Required!";
+      error.activities = err;
     }
-    console.log(error,'error from validate in helper-utill');
     return error;
   }
 
@@ -132,3 +133,19 @@
     }
     return error;
   }
+
+
+  export const  validateFileType=(file)=> {
+    
+    console.log(file.type,'file in validateFileType');
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif|\.avif)$/i; // Regular expression to match file extensions
+    const fileType = file.type;  // Get MIME type of file
+    if(!allowedExtensions.exec(file.name)) {
+        alert('Invalid file type. Only images with jpg, jpeg, png, or gif extensions are allowed');
+        return false;
+    } else if (!/^image\/(jpe?g|png|gif|avif)$/i.test(fileType)) {
+        alert('Invalid file type. Only images with jpg, jpeg, png, or gif MIME types are allowed');
+        return false;
+    }
+    return true;
+ }

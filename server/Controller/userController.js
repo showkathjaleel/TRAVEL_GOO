@@ -79,7 +79,9 @@ module.exports = {
           const file = req.file
 
           const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
-          const buffer = await sharp(req.file.buffer).resize({ height: 1920, width: 1080, fit: 'contain' }).toBuffer()
+          const buffer = await sharp(req.file.buffer)
+          .rotate()
+          .resize({ height: 600, width: 800, fit: 'cover', withoutEnlargement: true }).toBuffer()
           const imageName = randomImageName()
 
           const params = {
@@ -210,6 +212,8 @@ module.exports = {
   // get a user
 
   getUser: async (req, res) => {
+  console.log('getUser il keriiiiiiiii', req.params.id)
+
     try {
       const user = await User.findById(req.params.id)
 

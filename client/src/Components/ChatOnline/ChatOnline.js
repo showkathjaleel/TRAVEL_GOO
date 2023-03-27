@@ -3,11 +3,8 @@ import React, { useEffect, useState } from "react";
 import "./ChatOnline.css";
 
 function ChatOnline({ onlineUsers, currentUserId, setCurrentChat }) {
-  console.log(onlineUsers, currentUserId, setCurrentChat);
   const [friends, setFriends] = useState([]);
   const [onlineFriends, setOnlineFriends] = useState([]);
-  console.log(onlineFriends, "onlineFriends muthe");
-  console.log(friends, "friends in chatOnline");
 
   useEffect(() => {
     const getFriends = async () => {

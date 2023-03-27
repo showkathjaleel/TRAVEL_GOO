@@ -217,7 +217,7 @@ function Signup() {
                   name="confirmpassword"
                   value={data.confirmpassword}
                   onChange={handleChange}
-                  placeholder="ConfirmPassword"
+                  placeholder="Confirm Password"
                   autoComplete="off"
                 />
                 <svg

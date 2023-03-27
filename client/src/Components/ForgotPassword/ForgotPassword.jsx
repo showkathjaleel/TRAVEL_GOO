@@ -176,8 +176,6 @@ function ForgotPassword() {
         </div>
       </section>
     </>
-
-
   );
 }
 

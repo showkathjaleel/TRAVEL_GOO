@@ -1,21 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
-import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-// import DecodeUser from "./DecodeUser";
 import { AuthUser } from "../Context/AuthUser";
 
 export default function Header({ fixed }) {
   const { userAuth } = useContext(AuthUser);
-  console.log(" from Header");
+  
 
   const navigate = useNavigate();
   const [currentuser, setCurrentuser] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [navbarOpen, setNavbarOpen] = React.useState(false);
 
   useEffect(() => {
     if (userAuth) {
-      setIsLoggedIn(true);
       setCurrentuser(userAuth);
     }
   }, [userAuth]);

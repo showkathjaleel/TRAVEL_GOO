@@ -5,11 +5,12 @@ import Card from "./Card";
 import FriendInfo from "./FriendInfo";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { fetchUser } from "../api/user";
 
 export default function ProfileContent({ activeTab, userId }) {
   const [posts, setPosts] = useState([]);
-  // const {userAuth}=useContext(AuthUser)
-  // const [profile, setProfile] = useState(null);
+  const [friends, setFriends] = useState([]);
+
 
   useEffect(() => {
     if (!userId) {
@@ -18,14 +19,23 @@ export default function ProfileContent({ activeTab, userId }) {
 
     async function loadPosts() {
       const res = await axios.get("/posts/profile/" + userId);
-      // const profile = await userProfile(userId);
-      setPosts(res.data);
+      
+      setPosts(res.data.sort((p1,p2)=>{
+        return new Date (p2.createdAt)-new Date(p1.createdAt);
+      }))
+      // setPosts(res.data);
       // setProfile(userAuth);
     }
     loadPosts();
+    getUser()
   }, [userId]);
 
-  console.log(posts, "posts in profileContent");
+
+  const getUser = async () => {
+    fetchUser(userId).then((result)=>{
+       setFriends(result.following)
+    })
+  };
 
   return (
     <div>
@@ -41,7 +51,7 @@ export default function ProfileContent({ activeTab, userId }) {
             ))}
         </div>
       )}
-      {activeTab === "/profile/about" && (
+      {/* {activeTab === "/profile/about" && (
         <div>
           <Card>
             <h2 className="text-3xl mb-2">About me</h2>
@@ -59,21 +69,26 @@ export default function ProfileContent({ activeTab, userId }) {
             </p>
           </Card>
         </div>
-      )}
+      )} */}
       {activeTab === "/profile/friends" && (
         <div>
           <Card>
             <h2 className="text-3xl mb-2">Friends</h2>
             <div className="">
-              <div className="border-b border-b-gray-100 p-4 -mx-4">
+
+              {friends?.length>0 &&
+              friends.map((friend)=>(
+                <div className="border-b border-b-gray-100 p-4 -mx-4">
+                <FriendInfo friends={friend}/>
+              </div>
+              ))}
+
+              {/* <div className="border-b border-b-gray-100 p-4 -mx-4">
                 <FriendInfo />
               </div>
               <div className="border-b border-b-gray-100 p-4 -mx-4">
                 <FriendInfo />
-              </div>
-              <div className="border-b border-b-gray-100 p-4 -mx-4">
-                <FriendInfo />
-              </div>
+              </div> */}
             </div>
           </Card>
         </div>

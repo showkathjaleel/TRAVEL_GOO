@@ -18,8 +18,11 @@ function Avatar({ size, editable, url, onChange }) {
   let width = "w-12";
   let height="h-12"
   if (size === "lg") {
-    width = "w-24 md:w-36";
-    height= "h-24 md:w-36";
+    // width = "w-28  md:w-36";
+    // height= "h-44  md:w-44 ";
+
+    width ="w-32  md:w-32";
+    height ="w-40 md:w-40";
   }
 
   function handleClick() {
@@ -106,13 +109,13 @@ function Avatar({ size, editable, url, onChange }) {
   }
 
   return (
-    <div className={`${width} ${height} relative`}>
-      <div className="rounded-full overflow-hidden">
+    <div className= {`${width} ${height} relative`}>
+      <div className="rounded-full overflow-hidden ">
         <img src={url} alt="" className={`${width} ${height} relative`} onClick={handleClick} />
       </div>
 
       {showModal && (
-        <Modal
+        <Modal 
           show={showModal}
           // url={url}
         >
@@ -175,7 +178,7 @@ function Avatar({ size, editable, url, onChange }) {
                   </span>
                 </button>
 
-                <label className="inline-flex items-center px-4 py-2 text-white bg-indigo-600 border border-indigo-600  rounded-full hover:bg-indigo-700 focus:outline-none focus:ring">
+                <label className="inline-flex w- items-center px-4 py-2 text-white bg-indigo-600 border border-indigo-600  rounded-full hover:bg-indigo-700 focus:outline-none focus:ring">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"

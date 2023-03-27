@@ -33,3 +33,9 @@ export const createTrip = async (
   });
   return "success";
 };
+
+// export const enrollToTrip=async()=>{
+//  const {data}=await axios.put("/trip/enrollToTrip/" + tourdetails._id, {
+//     userId: userAuth._id,
+//   })
+// }

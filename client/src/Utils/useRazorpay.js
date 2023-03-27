@@ -1,7 +1,8 @@
 
 
 import axios from "axios";
-export const initPayment = async (order) => {
+export const initPayment = async (order,onSuccess,fetchTrip) => {
+  console.log(fetchTrip,'fetchTrip function in paymentt')
     const RAZORPAY_KEY_ID = "rzp_test_NBKIQegHCsjMos";
 
     const options = {
@@ -28,15 +29,17 @@ export const initPayment = async (order) => {
             signature,
             orderId,
           });
-          console.log(verifyPaymentResponse, 'verifyPaymentResponseeee');
-          return verifyPaymentResponse;
+          // console.log(verifyPaymentResponse, 'verifyPaymentResponseeee');
+          // return verifyPaymentResponse;
                 
-          // if (verifyPaymentResponse.data.signatureIsValid) {
-          //   // Payment successful, perform necessary actions
-          // } else {
-          //   // Payment signature invalid
-          //  // setPaymentError("Payment signature invalid")
-          // }
+          if (verifyPaymentResponse.data.signatureIsValid) {
+            // Payment successful, perform necessary actions
+            onSuccess()
+            fetchTrip()
+          } else {
+            // Payment signature invalid
+           // setPaymentError("Payment signature invalid")
+          }
         } catch (error) {
           //setPaymentError("Error verifying payment");
 

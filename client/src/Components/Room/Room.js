@@ -19,12 +19,14 @@ function Room(){
   const [callEnded, setCallEnded]=useState(false);
   const [name,setName]=useState("")
   const [stream,setStream]=useState()
+  const [bool,setBool]=useState(false)
+  
 
 
     //render our own vido to screen
     const myVideo=useRef(null)
     //    //we dont want to hear our own audio.
-       myVideo.muted=true;
+      //  myVideo.muted=true;
     const userVideo=useRef()
     const connectionRef=useRef()
     
@@ -32,24 +34,21 @@ useEffect(()=>{
     //connecting our video and audio and send it to other useers
     const getUserMedia = async () => {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({video: true,audio:true});
-          setStream(stream)
+          const Stream = await navigator.mediaDevices.getUserMedia({video: true,audio:true});
+          setStream(Stream)
+          setBool(true)
           console.log(stream,'stream');
+         console.log(myVideo.current.srcObject,'myVideo.current');
           myVideo.current.srcObject = stream;
+          
         } catch (err) {
           console.log(err);
         }
       };
-      getUserMedia();
+      getUserMedia(); 
 
-//    navigator.mediaDevices.getUserMedia({
-//     video:true,
-//     audio:true
-//    }).then((stream)=>{
-//     console.log(stream , "STREAM  in useEffect");
-//     setStream(stream)   
-//      myVideo.current.srcObject=stream;
-//    })
+
+
 
   
    if (socket && typeof socket.on === 'function') {
@@ -61,10 +60,7 @@ useEffect(()=>{
   } else {
     console.error("socket is not defined or does not have a method named 'on'")
   }
-//    socket.on("me",(id)=>{
-//     console.log(id , "id in callUser in useEffect");
-//     setMe(id)
-//    })
+
 
    socket.on("callUser",(data)=>{
     console.log(data , "data in me in useEffect");
@@ -74,7 +70,9 @@ useEffect(()=>{
     setCallerSignal(data.signal)
    })
 
-},[])
+},[bool])
+
+// ------------------------------------------//
 
 const callUser=(id)=>{
     console.log(id ,'id in calluser');
@@ -86,11 +84,11 @@ const callUser=(id)=>{
         }
       );
 
-      peer.on("signal",data=>{
+      peer.on("signal",(data)=>{
         //send event to server
         socket.emit("callUser",{
             userToCall:id,
-            signalData:data,
+            signalData:data, 
             from:me,
             name:name
         })
@@ -145,9 +143,11 @@ const leaveCall=()=>{
 		<div className="container">
 			<div className="video-container">
 				<div className="video">
-					{stream &&  <video 
+					{stream && 
+           <video 
                     // playsInline muted 
-                    ref={myVideo} autoPlay style={{ width: "300px" }} />}
+                    ref={myVideo} autoPlay style={{ width: "300px" }} />
+                     }
 				</div>
 				<div className="video">
 					{callAccepted && !callEnded ?

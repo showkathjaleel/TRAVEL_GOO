@@ -6,16 +6,12 @@ import ProfileTabs from "../SharedComponents/ProfileTabs";
 import Cover from "../SharedComponents/Cover";
 import { AuthUser } from "../Context/AuthUser";
 import ProfileContent from "../SharedComponents/ProfileContent";
-import axios from "axios";
 import { useLocation } from "react-router-dom";
 import { fetchUser } from "../api/user";
 import { updateUser } from "../api/user";
+import Header from "../SharedComponents/Header";
 
 export default function ProfilePage() {
-  console.log("profilepage");
-
-  //  -----------------------------------------------------------------------------
-  // const [cookies,setCookies] = useCookies([]);
 
   const location = useLocation();
   const { userAuth } = useContext(AuthUser);
@@ -24,14 +20,9 @@ export default function ProfilePage() {
   const [name, setName] = useState("");
   const [place, setPlace] = useState("");
   const [boolean, setBoolean] = useState(false);
-
-  const [following, setFollowing] = useState(false);
-  // const followClasses = following ? 'bg-white text-black' : 'bg-blue-500 text-white';
-
   const search = useLocation().search;
   const userId = new URLSearchParams(search).get("userId");
   const isMyUser = userId === userAuth?._id; // ACTUAL ONE
-  console.log(profile?.ProfilePicture,'profilePicture');
 
   //  -----------------------------------------------------------------------------
 
@@ -41,11 +32,12 @@ export default function ProfilePage() {
   //     setcurrentUser(userAuth);
   //   }
   // },[currentuser._id])
-
   //ith uncomment cheythal post kanam
+
+   //  const userId=currentuser._id;
   //  -----------------------------------------------------------------------------
 
-  //  const userId=currentuser._id;
+
   useEffect(() => {
     setBoolean(false);
     if (!userId) {
@@ -67,40 +59,23 @@ export default function ProfilePage() {
         setEditMode(false);
 
     })
-    // try {
-    //   const res = await axios.put("api/updateUser/" + profile._id, {
-    //     username: name,
-    //     city: place,
-    //     userId,
-    //   });
-    //   setBoolean(true);
-    //   setEditMode(false);
-    //   //  setcurrentUser(prev => ({...prev,name,place}))
-    // } catch (err) {}
   };
 
-  //  const followHandler=async( )=>{
-  //   const res=axios.put('/api/followUser/'+ userId,{
-  //    currentuser:userAuth._id                          //ith thalkkalam comment cheythekkan.After review you have to uncomment this
-  //   })
-  //   console.log(res,'response from followHandler');
-  //   setFollowing(true)
-  //  }
 
   return (
+    <>
+    <Header/>
     <Layout>
-      {/* <UserContextProvider> */}
       <Card noPadding={true}>
         <div className="relative overflow-hidden rounded-md">
           <Cover
-            // url="https://images.unsplash.com/photo-1545322780-5d71e8bb3847?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80"
             editable={isMyUser}
             url={profile?.CoverPicture}
             onChange={fetchUser}
           />
           <div className="absolute top-24 left-4 z-20">
             {profile && (
-              <Avatar
+              <Avatar className='w-32 md:w-32 '
                 url={
                   profile.ProfilePicture
                     ? profile.ProfilePicture
@@ -190,18 +165,6 @@ export default function ProfilePage() {
                     </button>
                   )}
                 </div>
-
-                {/* <button
-      className='text-blue-500 bg-white border-blue-500 rounded-sm w-20 h-8 absolute'
-      onClick={followHandler}>
-      Follow     
-    </button>
-     
-     {following &&  <button
-      className='text-blue-500 bg-white border-blue-500 rounded-sm w-20 h-8 absolute'
-      onClick={followHandler}>
-      Following     
-    </button> } */}
               </div>
             </div>
             <ProfileTabs active={location.pathname} userId={profile?._id} />
@@ -209,22 +172,8 @@ export default function ProfilePage() {
         </div>
       </Card>
       <ProfileContent activeTab={location.pathname} userId={profile?._id} />
-      {/* </UserContextProvider> */}
+      
     </Layout>
+    </>
   );
 }
-
-// import React from 'react'
-// import Profile from '../Components/UserProfile/UserProfile'
-// import Navbar from '../Components/Header/Header'
-// function UserProfilePage() {
-//   return (
-//     <div>
-
-//         <Navbar/>
-//         <Profile/>
-//     </div>
-//   )
-// }
-
-// export default UserProfilePage

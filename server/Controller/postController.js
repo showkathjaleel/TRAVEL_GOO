@@ -27,22 +27,15 @@ const s3 = new S3Client({
 
 module.exports = {
   createPost: async (req, res) => {
-    console.log('444444444444444444444444444444444444444444444444444444444')
-    console.log(req.file, 'req.filewwwwwwwwwwwwwwwwwwwwwwwwww')
-    console.log(req.body, 'req.body')
-
     // -------------------------------------------------------------------------------------------S3 BUCKET
     if (req.file) {
-      // Create a hash of the image name using the sha1 algorithm
-      //  const hash = crypto.createHash('sha1').update(file.originalname).digest('hex');
       const randomImageName = (bytes = 32) =>
         crypto.randomBytes(bytes).toString('hex')
       const buffer = await sharp(req.file.buffer)
-        .resize({ height: 1920, width: 1080, fit: 'contain' })
+        .rotate()
+        .resize({ height: 600, width: 800, fit: 'cover', withoutEnlargement: true })
         .toBuffer()
-      console.log(buffer, 'buffer000000000000000000000000000000')
       const imageName = randomImageName()
-
       const params = {
         Bucket: bucketName,
         Key: imageName,
@@ -50,7 +43,6 @@ module.exports = {
         ContentType: req.file.mimetype
       }
       const command = new PutObjectCommand(params)
-      console.log(command, 'command111111111111111111111111111111111111111111111111111111')
       await s3.send(command)
       req.body.img = imageName
     }

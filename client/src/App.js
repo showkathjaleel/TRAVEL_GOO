@@ -8,23 +8,27 @@ import SignupPage from "./Pages/Signup";
 import HomePage from "./Pages/Home";
 import ProtectedRoute from "./Components/protectedRoute/ProtectedRoute";
 import PrivateRoute from "./Components/PrivateRoute/PrivateRoute";
-// import NLogin from './Components/Login/NLogin';
+
 import LoginPage from "./Pages/Login";
 import "react-toastify/dist/ReactToastify.css";
 import DecodeUser from "./SharedComponents/DecodeUser";
 import SavedPosts from "./Pages/SavedPosts";
-import GuideLoginPage from "./Pages/GuideLoginPage";
+
 import RegisterEventPage from "./Pages/RegisterEventPage";
-// import RegisterEvent from "./SharedComponents/RegisterEvent";
-import TripDetails from "./SharedComponents/TripDetails";
-import Room from './Components/Room/Room'
+// import Room from './Components/Room/Room'
+import Room from './Components/Room/Agora'
+import Notifications from "./Components/Notifications/Notifications";
+import Preloader from "./SharedComponents/Preloader";
+
+
 
 
 //lazy loading
-const UpcomingEvents=lazy(()=>import("./SharedComponents/UpcomingTrips")) ;
-const Chat=lazy(()=>import("./Components/Chat/Chat"))
+const UpcomingEventsPage=lazy(()=>import("./Pages/UpcomingEventsPage")) ;
+const ChatPage =lazy(()=>import("./Pages/ChatPage")) ;
 const ProfilePage=lazy(()=>import("./Pages/Profile"))
-// const Room=lazy(()=>import("./Components/Room/Room"))
+const TripDetailsPage =lazy(()=>import("./Pages/TripDetailsPage")) ;
+
 
 function App() {
   return (
@@ -35,16 +39,17 @@ function App() {
            
             <Route element={<DecodeUser />}>
               <Route element={<PrivateRoute />}>
+
                 <Route exact path="/" element={<HomePage />} />
               </Route>
-              <Route path="/profile/*" element={<Suspense fallback='Loading...'> <ProfilePage /></Suspense>} />
-              <Route path="/chat" element={<Suspense fallback='Loading...'><Chat /></Suspense>} />
+              <Route path="/profile/*" element={<Suspense fallback={<Preloader/>}> <ProfilePage /></Suspense>} />
+              <Route path="/chat" element={<Suspense fallback={<Preloader/>}><ChatPage /></Suspense>} />
               <Route path="/saved" element={<SavedPosts />} />              
               <Route path="/create-event" element={<RegisterEventPage />} />      
-              <Route path="/upcoming-events" element={<Suspense fallback='Loading...'> <UpcomingEvents/></Suspense>}/>             
-              <Route path="/trip-details" element={<TripDetails/>} />
+              <Route path="/upcoming-events" element={<Suspense fallback={<Preloader/>}> <UpcomingEventsPage/></Suspense>}/>             
+              <Route path="/trip-details" element={<Suspense fallback={<Preloader/>}> <TripDetailsPage/> </Suspense> }/>
               <Route path="/room" element={<Room/>} />
-              
+              <Route path="/notifications" element={<Notifications/>} />
             </Route>
 
             <Route element={<ProtectedRoute />}>
@@ -52,12 +57,9 @@ function App() {
               {/* used to prevent refreshing */}
               <Route path="/newlogin" element={<LoginPage />} />
             </Route>
-
-            <Route path="/guidelogin" element={<GuideLoginPage />} />
-           
+         
             <Route path="/forgotpassword" element={<ForgotpasswordPage />} />
 
-            {/* upcomingEvents     */}
         
           </Routes>
         </Fragment>

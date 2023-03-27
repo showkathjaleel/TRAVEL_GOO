@@ -1,25 +1,34 @@
 import React, { useContext } from "react";
 import Card from "./Card";
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+// import { useEffect, useState } from "react";
+import { Link , useLocation} from "react-router-dom";
 import axios from "axios";
 import { AuthUser } from "../Context/AuthUser";
 import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+// import { socketNotification } from "../Context/NotificationContext";
+
+
+    
+
 
 function NavigationCard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [bool, setBool] = useState(false);
   const { userAuth } = useContext(AuthUser);
+
+  //const {socket}=useContext(socketNotification)
+  // const [notifications,setNotifications]=useState([])
+  // useEffect(()=>{
+  //       socket?.on("getNotification",(data)=>{
+  //         setNotifications((prev)=>[...prev,data])
+  //       })
+  // },[socket])
 
   const activeElementClasses =
     "text-sm md:text-md flex gap-1 md:gap-3 py-3 my-1 bg-socialBlue text-white md:-mx-7 px-6 md:px-7 rounded-md shadow-md shadow-gray-300 items-center";
   const nonActiveElementClasses =
     "text-sm md:text-md flex gap-1 md:gap-3 py-2 my-2 hover:bg-blue-500 hover:bg-opacity-20 md:-mx-4 px-6 md:px-4 rounded-md transition-all hover:scale-110 hover:shadow-md shadow-gray-300 items-center";
 
-  // useEffect(() => {
-  // }, [bool]);
 
   function logout() {
     axios
@@ -28,16 +37,22 @@ function NavigationCard() {
       })
       .then((res) => {
         if (res.data.msg) {
-          setBool(true);
+          // setBool(true);
           userAuth.jwt = null;
           navigate("/newlogin");
         }
       });
   }
 
+  // const handleNotification=()=>{
+  //   navigate(
+  //     "/notifications",
+  //     {state:notifications})
+  // }
+
   return (
     <Card noPadding={true}>
-      <div className="px-4 py-2 flex justify-between md:block shadow-md shadow-gray-500 md:shadow-none">
+      <div className="px-4 py-2 flex justify-between md:block shadow-md shadow-gray-500 md:shadow-none ">
         <h2 className="text-gray-400 mb-3 hidden md:block">Navigation</h2>
         <Link
           to="/"
@@ -87,7 +102,7 @@ function NavigationCard() {
           </svg>
           <span className="hidden md:block">Profile</span>
         </Link>
-        <Link
+        {/* <Link
           to="/profile/friends"
           className={
             location.pathname === "/profile/friends"
@@ -95,6 +110,7 @@ function NavigationCard() {
               : nonActiveElementClasses
           }
         >
+        
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -110,8 +126,8 @@ function NavigationCard() {
             />
           </svg>
           <span className="hidden md:block">Friends</span>
-        </Link>
-        <Link
+        </Link> */}
+        {/* <Link
           to="/saved"
           className={
             location.pathname === "/saved"
@@ -134,11 +150,12 @@ function NavigationCard() {
             />
           </svg>
           <span className="hidden md:block">Saved posts</span>
-        </Link>
+        </Link> */}
+
         <Link
           to="/chat"
           className={
-            location.pathname === "/chats"
+            location.pathname === "/chat"
               ? activeElementClasses
               : nonActiveElementClasses
           }
@@ -159,8 +176,9 @@ function NavigationCard() {
           </svg>
           <span className="hidden md:block">Chats</span>
         </Link>
-        <Link
-          href="/notifications"
+        
+        {/* <div onClick={handleNotification}
+
           className={
             location.pathname === "/notifications"
               ? activeElementClasses
@@ -182,7 +200,12 @@ function NavigationCard() {
             />
           </svg>
           <span className="hidden md:block">Notifications</span>
-        </Link>
+          {
+notifications.length >0 &&
+            <div className="counter">{notifications.length}</div>
+          }
+          </div> */}
+       
         <Link
           to="/upcoming-events"
           className={

@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.conversation{
+    display: flex;
+    padding-right: 10px;
+    margin: top 20px;
+    cursor: pointer;
+}
+.conversationImg{
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 20px;
+
+}
+.conversationName{
+    font-weight:500;
+    
+
+}
