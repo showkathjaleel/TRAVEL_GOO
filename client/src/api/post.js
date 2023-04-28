@@ -1,16 +1,13 @@
-import axios from "axios";
-import { getToken } from "./tokenfetch";
+import Axios from "../Utils/Axios";
+import TokenFetch from "./tokenFetch";
 
 export const postComment = async (senderId, postId, text) => {
   try {
-    const { data } = await axios.post("comment/createcomment", {
+    const { data } = await Axios.post("comment/createcomment", {
       senderId: senderId,
       postId: postId,
       text: text,
 
-      // headers: {
-      //   "x-accesss-token": token,
-      // },
     });
     console.log(data, "data");
     return data;
@@ -19,11 +16,15 @@ export const postComment = async (senderId, postId, text) => {
   }
 };
 
-export const likeHandler = async (postId, userId) => {
+export const likeHandler = async (postId, userId,token) => {
   try {
-    const { data } = await axios.put("posts/likePost/" + postId, {
+    const { data } = await Axios.put("posts/likePost/" + postId, {
       userId: userId,
-    });
+    },
+    {
+      headers: { authorization: "Bearer " + token},
+    }
+    );
     return data;
   } catch (err) {
     console.log(err);
@@ -33,7 +34,7 @@ export const likeHandler = async (postId, userId) => {
 export const postDelete = async (postId, postUserId) => {
   try {
     //if i want to make sure that the user is the owner of the id from from front end itself i can give currentuser._id
-    const { data } = await axios.post("/posts/deletePost/" + postId, {
+    const { data } = await Axios.post("/posts/deletePost/" + postId, {
       userId: postUserId,
     });
     return data;
@@ -45,7 +46,7 @@ export const postDelete = async (postId, postUserId) => {
 export const savePost = async (postId, userId) => {
   //function to save the post
   try {
-    const { data } = await axios.post("/posts/save/" + postId, {
+    const { data } = await Axios.post("/posts/save/" + postId, {
       userId: userId,
     });
     console.log(data, "data in savepost");
@@ -55,15 +56,12 @@ export const savePost = async (postId, userId) => {
   }
 };
 
-export const fetchComments = async (postId) => {
+export const fetchComments = async (postId,token) => {
   try {
-    const token = getToken("token");
-    const { data } = await axios.get(`comment/getcomments/${postId}`,
-    {
-          headers: {
-        "x-accesss-token": token,
-          }
+    const { data } = await Axios.get(`comment/getcomments/${postId}`,{
+      headers: { authorization: "Bearer " + token},
     })
+  
     return data.comments;
   } catch (err) {
     console.log(err, "err in fetchComments");
@@ -71,17 +69,54 @@ export const fetchComments = async (postId) => {
 };
 
 export const createPost = async (image, userId) => {
-  console.log(image, "image", userId, "userId");
   const formdata = new FormData();
   formdata.append("image", image);
   formdata.append("userId", userId);
   try {
-    await axios.post("posts/createpost", formdata, {
+    await Axios.post("posts/createpost", formdata, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    console.log("data in createpost");
     return "success";
   } catch (err) {
     console.log(err, "err in createPost");
   }
 };
+
+
+export const fetchPostsInProfile= async(userId,token)=>{
+  try{
+    const {data} = await Axios.get("/posts/profile/" + userId,
+    {
+      headers: { authorization: "Bearer " + token},
+    }
+    );
+    const posts = data.sort((p1, p2) => {
+        return new Date(p2.createdAt) - new Date(p1.createdAt);
+      })
+      return posts;
+  }catch(err){
+    console.log(err)
+  }
+ 
+}
+
+export const fetchAllPosts = async (token) => {
+  try{
+     // const res=await axios.get('posts/timelinePost/'+userAuth._id)
+    const {data} = await Axios.get("posts/getallposts",
+    {
+      headers: { authorization: "Bearer " + token },
+    }
+    );
+ 
+    const Allposts= data.posts.sort((p1,p2)=>{
+      return new Date (p2.createdAt)-new Date(p1.createdAt);
+    })
+    return Allposts;
+  }
+  catch(err){
+      console.log(err)
+  }
+ 
+};
+

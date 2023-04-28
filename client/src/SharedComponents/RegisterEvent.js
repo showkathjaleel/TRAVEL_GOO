@@ -1,14 +1,14 @@
 import React from "react";
 import Layout from "./Layout";
 import { useState, useEffect, useContext } from "react";
-import { AuthUser } from "../Context/AuthUser";
 import { useNavigate } from "react-router-dom";
 import { validate } from "../Utils/helper";
 import { validateDestination } from "../Utils/helper";
 import { createTrip } from "../api/trip";
+import { useSelector } from "react-redux";
 
 function RegisterEvent() {
-  const { userAuth } = useContext(AuthUser);
+  const userId=useSelector(store=>store.user.userId)
   const navigate = useNavigate();
   const [eventData, setEventData] = useState({
     departureDate: "",
@@ -76,7 +76,7 @@ function RegisterEvent() {
       locations,
       activities,
       cost,
-      userAuth._id
+      userId
     ).then((res) => {
       navigate("/upcoming-events");
     });

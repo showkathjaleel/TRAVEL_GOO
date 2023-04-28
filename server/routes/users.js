@@ -1,13 +1,16 @@
 const userController = require('../Controller/userController')
 const router = require('express').Router()
-//const { verifyToken } = require('../middleware');
 
 const multer = require('multer')
+const { verifyToken } = require('../middleware')
 const storage = multer.memoryStorage()
 const upload = multer({ storage })
-// const upload = multer({ dest: 'uploads/' })
 
-router.put('/updateUser/:id', upload.single('image'), userController.updateUser)
+router.put('/updateUser/:id', userController.updateUser)
+
+router.put('/updateProfilePicture/:id', upload.single('image'), userController.updateProfilePicture)
+
+router.put('/updateCoverPicture/:id', upload.single('image'), userController.updateCoverPicture)
 
 router.delete('/deleteUser/:id', userController.deleteUser)
 

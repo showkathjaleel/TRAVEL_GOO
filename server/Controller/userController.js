@@ -1,7 +1,7 @@
 
 const User = require('../models/User')
 const bcrypt = require('bcrypt')
-
+const { putImagestoS3 } = require('../tools/s3')
 const { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3')
 // const { putObjectCommand } = require('@aws-sdk/client-s3')
 const jwt = require('jsonwebtoken')
@@ -40,99 +40,48 @@ module.exports = {
           return res.status(500).json(err)
         }
       }
-      // ======================================================================================
-
-      // if (req.file) {
-      //   const file = req.file;
-
-      //   // Create a hash of the image name using the sha1 algorithm
-      //   //  const hash = crypto.createHash('sha1').update(file.originalname).digest('hex');
-      //   const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex');
-      //   const buffer = await sharp(req.file.buffer).resize({ height: 1920, width: 1080, fit: "contain" }).toBuffer()
-      //   const imageName = randomImageName()
-
-      //   const params = {
-      //     Bucket: bucketName,
-      //     Key: imageName,
-      //     Body: buffer,
-      //     ContentType: req.file.mimetype,
-      //   }
-      //   console.log('params', params);
-
-      //   const command = new PutObjectCommand(params)
-      //   console.log('command', command);
-
-      //   const response = await s3.send(command)
-      //   console.log('response', response);
-
-      //   const user = await User.findByIdAndUpdate(req.params.id,
-      //     {
-      //       $set: { ProfilePicture: imageName }
-      //     });
-      //   return res.status(200).json({ user })
-      // }
 
       if (req.file) {
-        console.log(req.body.data, '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%')
-        if (req.body.data === 'profilePicture') {
-          console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
-          const file = req.file
+        // if (req.body.data === 'profilePicture') {
+        //   const file = req.file
+        //   putImagestoS3(file).then(async (imageName) => {
+        //     const user = await User.findByIdAndUpdate(req.params.id,
+        //       {
+        //         $set: { ProfilePicture: imageName }
+        //       })
+        //     return res.status(200).json({ user })
+        //   })
+        // }
+        // else if (req.body.data === 'coverPicture') {
+        //   console.log('yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy')
 
-          const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
-          const buffer = await sharp(req.file.buffer)
-          .rotate()
-          .resize({ height: 600, width: 800, fit: 'cover', withoutEnlargement: true }).toBuffer()
-          const imageName = randomImageName()
+        //   const file = req.file
 
-          const params = {
-            Bucket: bucketName,
-            Key: imageName,
-            Body: buffer,
-            ContentType: req.file.mimetype
-          }
-          console.log('params', params)
+        //   const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
+        //   const buffer = await sharp(req.file.buffer).resize({ height: 1920, width: 1080, fit: 'contain' }).toBuffer()
+        //   const imageName = randomImageName()
 
-          const command = new PutObjectCommand(params)
-          console.log('command', command)
+        //   const params = {
+        //     Bucket: bucketName,
+        //     Key: imageName,
+        //     Body: buffer,
+        //     ContentType: req.file.mimetype
+        //   }
 
-          const response = await s3.send(command)
-          console.log('response', response)
+        //   console.log('params', params)
 
-          const user = await User.findByIdAndUpdate(req.params.id,
-            {
-              $set: { ProfilePicture: imageName }
-            })
-          return res.status(200).json({ user })
-        } else if (req.body.data === 'coverPicture') {
-          console.log('yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy')
+        //   const command = new PutObjectCommand(params)
+        //   console.log('command', command)
 
-          const file = req.file
+        //   const response = await s3.send(command)
+        //   console.log('response', response)
 
-          const randomImageName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
-          const buffer = await sharp(req.file.buffer).resize({ height: 1920, width: 1080, fit: 'contain' }).toBuffer()
-          const imageName = randomImageName()
-
-          const params = {
-            Bucket: bucketName,
-            Key: imageName,
-            Body: buffer,
-            ContentType: req.file.mimetype
-          }
-
-          console.log('params', params)
-
-          const command = new PutObjectCommand(params)
-          console.log('command', command)
-
-          const response = await s3.send(command)
-          console.log('response', response)
-
-          const user = await User.findByIdAndUpdate(req.params.id,
-            {
-              $set: { CoverPicture: imageName }
-            })
-          return res.status(200).json({ user })
-        }
+        //   const user = await User.findByIdAndUpdate(req.params.id,
+        //     {
+        //       $set: { CoverPicture: imageName }
+        //     })
+        //   return res.status(200).json({ user })
+        // }
       }
 
       // ======================================================================================
@@ -212,7 +161,7 @@ module.exports = {
   // get a user
 
   getUser: async (req, res) => {
-  console.log('getUser il keriiiiiiiii', req.params.id)
+    console.log('getUser il keriiiiiiiii', req.params.id)
 
     try {
       const user = await User.findById(req.params.id)
@@ -368,5 +317,32 @@ module.exports = {
         $unset: { ProfilePicture: imageName }
       })
     return res.status(200).json({ ImgDeletedUser })
+  }
+}
+
+module.exports.updateProfilePicture = async (req, res) => {
+  if (req.file) {
+    putImagestoS3(req.file).then(async (imageName) => {
+      console.log(imageName, 'imageName')
+      const user = await User.findByIdAndUpdate(req.params.id,
+        {
+          $set: { ProfilePicture: imageName }
+        })
+      return res.status(200).json({ user })
+    })
+  }
+}
+
+module.exports.updateCoverPicture = async (req, res) => {
+  if (req.file) {
+    putImagestoS3(req.file).then(async (imageName) => {
+      console.log(imageName, 'imageName')
+      const user = await User.findByIdAndUpdate(req.params.id,
+        {
+          $set: { CoverPicture: imageName }
+        })
+      console.log(user, 'user in usercontroller')
+      return res.status(200).json({ user })
+    })
   }
 }

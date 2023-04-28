@@ -1,9 +1,8 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Chat.css";
 import Message from "../Message/Message";
 import ChatOnline from "../ChatOnline/ChatOnline";
-import axios from "axios";
-import { AuthUser } from "../../Context/AuthUser";
+import Axios from "../../Utils/Axios";
 import { useRef } from "react";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +10,7 @@ import { fetchUser } from "../../api/user";
 import Friends from "../Friends/Friends";
 import Card from "../../SharedComponents/Card";
 import { fetchChat } from "../../api/chat";
+import { useSelector } from "react-redux";
 
 function Chat() {
   const [currentChat, setCurrentChat] = useState(null);
@@ -18,7 +18,7 @@ function Chat() {
   const [newMessage, setNewMessage] = useState("");
   const [arrivalMessage, setArrivalMessage] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const { userAuth } = useContext(AuthUser);
+  // const { userAuth } = useContext(AuthUser);
   const [selectedUser, setSelectedUser] = useState("");
   const [selectedUserName, setSelectedUserName] = useState("");
   // const [bool, setBool] = useState(false);
@@ -39,7 +39,7 @@ function Chat() {
     });
   };
 
-  const userId = userAuth._id;
+  const userId = useSelector(store=>store.user.userId);
 
   useEffect(() => {
     socket.current = io("ws://localhost:8900");
@@ -77,7 +77,7 @@ function Chat() {
     });
 
     try {
-      const res = await axios.post("/message", message);
+      const res = await Axios.post("/message", message);
       setMessages([...messages, res.data]);
       setNewMessage("");
     } catch (err) {
@@ -105,7 +105,7 @@ function Chat() {
 
   const getConversation = (chattedUserId) => {
     setSelectedUser(chattedUserId);
-    fetchChat(userAuth._id, chattedUserId).then((result) => {
+    fetchChat(userId, chattedUserId).then((result) => {
       setCurrentChat(result);
     });
   };
@@ -113,7 +113,7 @@ function Chat() {
   useEffect(() => {
     const getMessages = async () => {
       try {
-        const res = await axios.get("/message/getmessage/" + currentChat?._id);
+        const res = await Axios.get("/message/getmessage/" + currentChat?._id);
         setMessages(res.data);
       } catch (err) {
         console.log(err);

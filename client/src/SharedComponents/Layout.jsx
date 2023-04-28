@@ -2,7 +2,7 @@
 import React from "react";
 import NavigationCard from "./Navigation";
 
-export default function Layout({ children, hideNavigation }) {
+export default function Layout({ children, hideNavigation, userId }) {
 
 
   let rightColumnClasses = "";

@@ -1,28 +1,25 @@
 import React from "react";
-import { useState, useContext } from "react";
+import { useState } from "react";
 import Preloader from "./Preloader";
-import axios from "axios";
-import { AuthUser } from "../Context/AuthUser";
+import Axios from "../Utils/Axios";
 import Modal from "./Modal";
 import Swal from "sweetalert";
+import { useSelector } from "react-redux";
+import { updateProfileImg } from "../api/user";
 
 function Avatar({ size, editable, url, onChange }) {
- 
   const [showModal, setShowModal] = useState(false);
   const [files, setFiles] = useState();
-  const { userAuth } = useContext(AuthUser);
+  const userId=useSelector(store=>store.user.userId)
   const [isUploading, setIsUploading] = useState(false);
   const [Isupdated, setIsUpdated] = useState(false);
   const [Isdeleted, setIsDeleted] = useState(false);
 
   let width = "w-12";
-  let height="h-12"
+  let height = "h-12";
   if (size === "lg") {
-    // width = "w-28  md:w-36";
-    // height= "h-44  md:w-44 ";
-
-    width ="w-32  md:w-32";
-    height ="w-40 md:w-40";
+    width = "w-32  md:w-32";
+    height = "w-40 md:w-40";
   }
 
   function handleClick() {
@@ -30,31 +27,17 @@ function Avatar({ size, editable, url, onChange }) {
   }
 
   async function handleAvatarChange(ev) {
-    const msg = "profilePicture";
+    setIsUploading(true);
     const file = ev.target.files?.[0];
-    const formdata = new FormData();
-    formdata.append("image", file);
-    formdata.append("userId", userAuth._id);
-    formdata.append("data", msg);
-
-    if (file) {
-      setIsUploading(true);
-      try {
-        await axios.put(
-          "api/updateUser/" + userAuth._id,
-          formdata,
-          { headers: { "Content-Type": "multipart/form-data" } }
-        );
-
-        setFiles(files);
-        setIsUploading(false);
-        if (onChange) onChange();
-        setIsUpdated(true); // to show the msg that uploaded successfully
-      } catch (err) {}
-    }
+    updateProfileImg(file,userId).then((result)=>{
+      setIsUploading(false);
+      setFiles(files);
+      if (onChange) onChange();
+      setIsUpdated(true); 
+    }).catch((err)=>{
+      console.log(err,'err');
+    })
   }
-
-
 
   // function postDelete(){
   //   alert(post.userId)
@@ -88,10 +71,9 @@ function Avatar({ size, editable, url, onChange }) {
     //   // }
     // })
 
-    axios
-      .post("/api/deleteProfileImg", {
-        userId: userAuth._id,
-      })
+    Axios.post("/api/deleteProfileImg", {
+      userId,
+    })
       .then((response) => {
         setShowModal(false);
         // if (response.data) {
@@ -109,13 +91,18 @@ function Avatar({ size, editable, url, onChange }) {
   }
 
   return (
-    <div className= {`${width} ${height} relative`}>
+    <div className={`${width} ${height} relative`}>
       <div className="rounded-full overflow-hidden ">
-        <img src={url} alt="" className={`${width} ${height} relative`} onClick={handleClick} />
+        <img
+          src={url}
+          alt=""
+          className={`${width} ${height} relative`}
+          onClick={handleClick}
+        />
       </div>
 
       {showModal && (
-        <Modal 
+        <Modal
           show={showModal}
           // url={url}
         >
@@ -245,3 +232,4 @@ function Avatar({ size, editable, url, onChange }) {
 }
 
 export default Avatar;
+

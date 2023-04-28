@@ -1,4 +1,4 @@
-import axios from "axios";
+import Axios from "../Utils/Axios";
 
 export const createTrip = async (
   eventData,
@@ -26,7 +26,7 @@ export const createTrip = async (
   formdata.append("totalCost", cost.totalCost);
   formdata.append("hostId", userId);
 
-  await axios.post(`/trip/addTrip`, formdata, {
+  await Axios.post(`/trip/addTrip`, formdata, {
     headers: {
       "Content-Type": "multipart/form-data",
     },

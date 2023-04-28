@@ -1,21 +1,23 @@
-import React, { useContext, useState } from "react";
+import React, {  useState } from "react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import Axios from "../../Utils/Axios";
 import { validateLogin } from "../../Utils/helper";
 import { googleSignIn } from "../../Utils/useGooglesigniin";
-
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useDispatch } from 'react-redux'
+import { setUserId } from "../../Store/features/userSlice";
 function Login() {
   const [values, setValues] = useState({
     email: "",
     password: "",
   });
-
   const [bool, setBool] = useState(false);
-  const [err, setErr] = useState();
   const [formError, setFormError] = useState({});
   const [islogin, setIslogin] = useState(false);
   const navigate = useNavigate();
+  const dispatch=useDispatch()
 
   const passwordView = () => {
     bool ? setBool(false) : setBool(true);
@@ -29,7 +31,7 @@ function Login() {
 
   useEffect(() => {
     if (Object.keys(formError).length === 0 && islogin) {
-      axios
+      Axios
         .post(
           "auth/login",
           {
@@ -39,13 +41,21 @@ function Login() {
             withCredentials: true,
           }
         )
-        .then(({ data }) => {
-          if (data.bool) {
-            setErr(data.message);
-          } else {
-            navigate("/");
-          }
-        });
+        .then(({data}) => {
+          const {accessToken,refreshToken,userId}=data;
+          document.cookie = `jwt=${accessToken}`;
+          dispatch(setUserId(userId))
+          navigate("/");
+          toast.success('Login successful!');
+        }).catch((err)=>{
+
+          ((error) => {
+            toast.error(error.response.data.msg, {
+                position: "top-center",
+            });
+        })(err);
+
+        })
     }
   }, [formError,islogin]);
 
@@ -56,18 +66,24 @@ function Login() {
     try {
       const res = await googleSignIn();
        const userDetail = res._tokenResponse;
-      const response = await axios.post("/auth/googlesignin", {
+      const {data} = await Axios.post("/auth/googlesignin", {
         email: userDetail.email,
         username: userDetail.fullName,
       });
+      document.cookie = `jwt=${data}`;
 
-      //  document.cookie=`jwt=${res.UserCredentialImp._tokenResponse.refreshToken}`
-      // navigate("/");
+      navigate("/");
+      toast.success('Login successful!');
     } catch (err) {
-      setErr(err.message);
+
+      ((error) => {
+        toast.error(error.response.data.msg, {
+            position: "top-center",
+        });
+    })(err);
+
     }
   };
-
 
 
   return (
@@ -76,20 +92,6 @@ function Login() {
         <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-5 items-center">
           <div className="md:w-1/2 px-8 md:px-16">
             <h2 className="font-bold text-2xl text-[#002D74]">Login</h2>
-
-          {/* {err &&
-                        <div  className="flex justify-between text-red-200 shadow-inner rounded p-3 bg-red-600" >
-                        <p className="self-center">{err}</p>
-                        <strong className="text-xl align-center cursor-pointer alert-del"
-                        onClick={()=>setErr("")}></strong
-                        >
-                      </div>} */}
-
-            {err && (
-              <p className="flex justify-between text-red-200 shadow-inner rounded p-3 bg-red-600">
-                {err}
-              </p>
-            )}
 
             <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <input
@@ -191,17 +193,24 @@ function Login() {
               Login with Google
             </button>
 
-            <div className="mt-5 text-xs border-b border-[#002D74] py-4 text-[#002D74]">
+            <div className="mt-5 text-xs border-b border-[#002D74] py-4 text-[#002D74] cursor-pointer">
               <p
                 onClick={() => {
                   navigate("/forgotpassword");
                 }}
               >
-                Forgot your password?
+                Forgot your password? 
+              </p>
+              <p
+                onClick={() => {
+                  navigate("/forgotpassword");
+                }}
+              >
+                Login with mail? 
               </p>
             </div>
 
-            <div className="mt-3 text-xs flex justify-between items-center text-[#002D74]">
+            <div className="mt-3 text-xs flex justify-between items-center text-[#002D74] cursor-pointer">
               <p>Don't have an account?</p>
 
               <button

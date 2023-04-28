@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const { verifyToken } = require('../middleware')
 const Comment = require('../models/Comment')
 
 // create comment
@@ -13,7 +14,7 @@ router.post('/createcomment', async (req, res) => {
 },
 
 // get comments
-router.get('/getcomments/:id', async (req, res) => {
+router.get('/getcomments/:id', verifyToken, async (req, res) => {
   try {
     const comments = await Comment.find({ postId: req.params.id })
     res.status(200).json({ comments })

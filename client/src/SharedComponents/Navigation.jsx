@@ -1,12 +1,15 @@
-import React, { useContext } from "react";
+import React, { useContext ,useEffect,useState} from "react";
 import Card from "./Card";
 // import { useEffect, useState } from "react";
 import { Link , useLocation} from "react-router-dom";
 import axios from "axios";
 import { AuthUser } from "../Context/AuthUser";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 // import { socketNotification } from "../Context/NotificationContext";
-
+import { useCookies } from 'react-cookie';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
     
 
@@ -14,7 +17,12 @@ import { useNavigate } from "react-router-dom";
 function NavigationCard() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { userAuth } = useContext(AuthUser);
+ // const { userAuth } = useContext(AuthUser);
+  const userId=useSelector(store=>store.user.userId)
+  const [cookies, setCookie, removeCookie] = useCookies();
+  
+
+
 
   //const {socket}=useContext(socketNotification)
   // const [notifications,setNotifications]=useState([])
@@ -31,17 +39,8 @@ function NavigationCard() {
 
 
   function logout() {
-    axios
-      .post("/api/logout", {
-        withCredentials: true,
-      })
-      .then((res) => {
-        if (res.data.msg) {
-          // setBool(true);
-          userAuth.jwt = null;
-          navigate("/newlogin");
-        }
-      });
+    removeCookie("jwt")
+    toast.success('Logout successfully');
   }
 
   // const handleNotification=()=>{
@@ -79,7 +78,7 @@ function NavigationCard() {
           <span className="hidden md:block">Home</span>
         </Link>
         <Link
-          to={`/profile?userId=${userAuth._id}`}
+          to={`/profile?userId=${userId}`}
           className={
             location.pathname === "/profile"
               ? activeElementClasses
@@ -127,7 +126,7 @@ function NavigationCard() {
           </svg>
           <span className="hidden md:block">Friends</span>
         </Link> */}
-        {/* <Link
+        <Link
           to="/saved"
           className={
             location.pathname === "/saved"
@@ -150,7 +149,7 @@ function NavigationCard() {
             />
           </svg>
           <span className="hidden md:block">Saved posts</span>
-        </Link> */}
+        </Link>
 
         <Link
           to="/chat"
@@ -230,8 +229,13 @@ notifications.length >0 &&
           </svg>
           <span className="hidden md:block">Upcoming Events</span>
         </Link>
-        <button onClick={logout} className=" -my-2">
-          <span className={nonActiveElementClasses}>
+        <Link
+          to=""
+          className={
+            location.pathname === "/logout"
+              ? activeElementClasses
+              : nonActiveElementClasses
+          }>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -246,9 +250,8 @@ notifications.length >0 &&
                 d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75"
               />
             </svg>
-            <span className="hidden md:block">Logout</span>
-          </span>
-        </button>
+            <span className="hidden md:block" onClick={logout}>Logout</span>
+            </Link>
       </div>
     </Card>
   );

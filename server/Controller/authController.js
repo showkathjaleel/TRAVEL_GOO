@@ -2,64 +2,137 @@ const User = require('../models/User')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
+require('dotenv').config()
+
+const maxAge = 3 * 224 * 60 * 60
+function generateAccessToken (userId) {
+  return jwt.sign({ id: userId }, process.env.ACCESS_TOKEN_SECRET, {
+    expiresIn: maxAge
+  })
+}
+function generateRefreshToken (userId) {
+  return jwt.sign({ id: userId }, process.env.REFRESH_TOKEN_SECRET)
+}
+const refreshTokens = []
+
 module.exports = {
   userRegister: async (req, res) => {
-    const user = await User.findOne({ email: req.body.email })
-
-    if (user) {
-      return res.json({ bool: true, message: 'User Already exists' })
-    }
-
     try {
+      const {
+        username,
+        email,
+        phone,
+        password
+
+      } = req.body
+      console.log('user signup il keri', req.body.email, 'maillllllllllllll')
+      const userExist = await User.findOne({ email })
+
+      if (userExist) {
+        return res.status(400).json({ msg: 'Email already used. ' })
+      }
+
       // generate new password
       const salt = await bcrypt.genSalt(10)
-      const hashedPassword = await bcrypt.hash(req.body.password, salt)
+      const hashedPassword = await bcrypt.hash(password, salt)
       // create new user
       const newUser = new User({
-        username: req.body.username,
-        email: req.body.email,
+        username,
+        email,
         password: hashedPassword,
-        confirmpassword: req.body.confirmpassword,
-        phone: req.body.phone,
-        isGuide: req.body.isGuide
+        phone
       })
       // save user and respond
       const user = newUser.save()
-      res.status(200).json({ user, bool: false })
+      res.status(200).json(user)
     } catch (err) {
-      console.log(err)
-      res.status(500).json(err)
+      res.status(500).json({ error: err.message })
     }
   },
 
   userLogin: async (req, res) => {
     try {
-      const user = await User.findOne({ email: req.body.email })
+      const { email, password } = req.body
+      console.log('user login il keriiiiiiiiii', req.body.email)
+      const user = await User.findOne({ email })
 
-      // !user && res.status(404).send("user not found")
       if (!user) {
-        return res.json({ bool: true, message: 'user not found' })
+        return res.status(400).json({ msg: 'User does not exist. ' })
       }
 
-      const validPassword = await bcrypt.compare(req.body.password, user.password)
+      const validPassword = await bcrypt.compare(
+        password,
+        user.password
+      )
       // if password is not valid
-
-      // !validPassword && res.status(400).json("wrong password")
       if (!validPassword) {
-        return res.json({ bool: true, message: 'wrong password' })
+        return res.status(400).json({ msg: 'Invalid credentials. ' })
       }
       // if password is  valid
-      const token = jwt.sign({ id: user._id },
-        process.env.ACCESS_TOKEN_SECRET)
-      const { password, ...info } = user._doc
-      res.cookie('jwt', token, {
-        httpOnly: true
-      }).status(200).send(info)
+      const accessToken = generateAccessToken(user._id)
+      const refreshToken = generateRefreshToken(user._id)
+      refreshTokens.push(refreshToken)
+      // user.refreshToken = refreshToken
+      // res.status(200).json({ accessToken, refreshToken })
+      console.log('accessToken in  login', accessToken)
+      res.status(200).json({ accessToken, refreshToken, userId: user._id })
     } catch (err) {
       console.log(err, 'err in catch of auth.js1')
+      res.status(500).json({ error: err.message })
       // const errors=handleErrors(err)
-      // console.log(errors,'err in catch of auth.js3');
-      // res.json({errors,created:false})
     }
+  }
+}
+
+module.exports.googleSignIn = async (req, res) => {
+  try {
+    const { email, username } = req.body
+    let user = await User.findOne({ email })
+    if (!user) {
+    // const createuser=User.
+      const newUser = new User({
+        username,
+        email
+      })
+      // save user and respond
+      user = newUser.save()
+    // const user = await User.findOne({ email: req.body.email })
+    }
+    const accessToken = generateAccessToken(user._id)
+    const refreshToken = generateRefreshToken(user._id)
+    refreshTokens.push(refreshToken)
+    res.status(200).json(accessToken)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
+
+module.exports.forgotPassword = async (req, res) => {
+  try {
+    const phoneNumber = req.body.phone.substring(3)
+    const Phone = parseInt(phoneNumber)
+    const user = await User.findOne({ phone: Phone })
+    if (!user) {
+      return res.status(400).json({ msg: 'User Not Found' })
+    }
+    res.status(200).json({ userexist: true })
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
+
+module.exports.otpLogin = async (req, res) => {
+  try {
+    let { phone } = req.body
+    phone = phone.substring(3)
+    const phoneNumber = parseInt(phone)
+    const user = await User.findOne({ phone: phoneNumber })
+    const accessToken = generateAccessToken(user._id)
+    console.log(accessToken,'lahdsald')
+    const refreshToken = generateRefreshToken(user._id)
+    refreshTokens.push(refreshToken)
+    res.status(200).json(accessToken)
+  } catch (err) {
+     console.log(err)
   }
 }

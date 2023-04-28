@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import axios from "axios";
+import Axios from "../Utils/Axios";
 import Card from "./Card";
 import Avatar from "./Avatar";
-import { useContext } from "react";
 import Layout from "./Layout";
-import { AuthUser } from "../Context/AuthUser";
 // import TripMembers from "./TripMembers";
 import moment from "moment";
 import useFetchUser from "../Utils/useFetchUser";
 import { initPayment } from "../Utils/useRazorpay";
+import { useSelector } from "react-redux";
 // import { enrollToTrip } from "../api/trip";
 
 function TripDetails() {
   const search = useLocation().search;
   const tripId = new URLSearchParams(search).get("tripId");
   const [tourdetails, setTourDetails] = useState();
-  const { userAuth } = useContext(AuthUser);
+  const userId=useSelector(store=>store.user.userId)
   const [members, setMembers] = useState();
   const [noOfMembers, setNoOfMembers] = useState();
   const [tripImages, setTripImages] = useState();
@@ -26,7 +25,7 @@ function TripDetails() {
   }, [tripId]);
 
   const fetchTrip = async () => {
-    const res = await axios.get("/trip/getTrip/" + tripId);
+    const res = await Axios.get("/trip/getTrip/" + tripId);
     setTourDetails(res.data.trip);
     setMembers(res.data.trip.JoinedMembers);
     setNoOfMembers(res.data.trip.JoinedMembers.length);
@@ -42,7 +41,7 @@ function TripDetails() {
 
   const handleClick = () => {
     const amount = tourdetails.costData.accomodationCost;
-    axios
+    Axios
       .post(
         `/payment/guideregister`,
         { amount },
@@ -61,23 +60,13 @@ function TripDetails() {
   };
 
   const enrollToTrip = async () => {
-    await axios.put("/trip/enrollToTrip/" + tourdetails._id, {
-      userId: userAuth._id,
+    await Axios.put("/trip/enrollToTrip/" + tourdetails._id, {
+      userId: userId,
     });
     return "success";
   };
 
-  //---------------------------------------------------------------------------
-  //  const [currentIndex, setCurrentIndex] = useState(0);
-  // const membersToShow = tourdetails.members.slice(currentIndex, currentIndex + 4);
 
-  // const handlePrevClick = () => {
-  //   setCurrentIndex(currentIndex - 4);
-  // };
-
-  // const handleNextClick = () => {
-  //   setCurrentIndex(currentIndex + 4);
-  // };
 
   return (
     <Layout>
@@ -293,7 +282,7 @@ function TripMembers({ members }) {
 
   useEffect(() => {
     const fetchMemberDetails = async () => {
-      const res = await axios.get("/api/getUser/" + members);
+      const res = await Axios.get("/api/getUser/" + members);
       SetMemberDetails(res.data);
     };
     fetchMemberDetails();

@@ -11,12 +11,14 @@ function DecodeUser() {
   useEffect(() => {
     if (cookies?.jwt) {
       const token = cookies.jwt;
-      const decoded = jwt_decode(token);
-      setUserAuth(decoded._doc);
+      // const decoded = jwt_decode(token);
+      // console.log(decoded,'decoded from decodeuser')
+      // const userId=decoded.id;
+      // setUserAuth(userId);
+      setUserAuth({accessToken:token})
     }
-  }, [cookies?.jwt]);
-
-  return userAuth?.username ? <Outlet /> : <Navigate to="/newlogin" />;
+  }, [userAuth?.accessToken]);
+  return userAuth?.accessToken? <Outlet /> : <Navigate to="/newlogin" />;
 }
 
 export default DecodeUser;

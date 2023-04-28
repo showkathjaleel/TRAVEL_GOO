@@ -6,6 +6,7 @@ const {
   DeleteObjectCommand
 } = require('@aws-sdk/client-s3')
 require('dotenv').config()
+console.log(process.env.AWS_BUCKET_NAME, 'bucketname in s3.js tools')
 const crypto = require('crypto')
 const sharp = require('sharp')
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner')
@@ -39,17 +40,38 @@ const putImagestoS3 = async (file) => {
   const randomImageName = (bytes = 32) =>
     crypto.randomBytes(bytes).toString('hex')
 
-  const storyName = randomImageName()
+  const imageName = randomImageName()
   const params = {
-    Bucket: process.env.BUCKET_NAME,
-    Key: storyName,
+    Bucket: bucketName,
+    Key: imageName,
     Body: file.buffer,
     ContentType: file.mimetype
   }
-
+  console.log('params', params)
   const command = new PutObjectCommand(params)
-  await s3.send(command)
-  return 'success'
+  console.log('command', command)
+  const response = await s3.send(command)
+  console.log(response, 'response')
+  return imageName
 }
 
-module.exports = { getImagesfromS3, putImagestoS3 }
+const deleteImagesfromS3 = async (imageName) => {
+  const params = {
+    Bucket: bucketName,
+    Key: imageName
+  }
+  console.log(params, '444444444444444444444444444444')
+  const command = new DeleteObjectCommand(params)
+  console.log(command, '555555555555555555555555')
+  const response = await s3.send(command)
+  console.log(response, '6666666666666666666666')
+  // const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
+  // imageName = url
+  // const ImgDeletedUser = await User.findByIdAndUpdate(req.body.userId,
+  //   {
+  //     $unset: { ProfilePicture: imageName }
+  //   })
+  // return res.status(200).json({ ImgDeletedUser })
+}
+
+module.exports = { getImagesfromS3, putImagestoS3 , deleteImagesfromS3}

@@ -1,37 +1,24 @@
 
-import {useContext, useState} from "react";
+import { useState} from "react";
 import Preloader from "./Preloader";
-import { AuthUser } from "../Context/AuthUser";
-import axios from "axios";
-
-// import {uploadUserProfileImage} from "../helpers/user";
+import { useSelector } from "react-redux";
+import { updateUserCoverImg } from "../api/user";
 
 export default function Cover({url,editable,onChange}) {
-
+  const userId=useSelector(store=>store.user.userId)
+  console.log(userId,'userid in cover')
   const [isUploading,setIsUploading] = useState(false);
-  const {userAuth}=useContext(AuthUser)
-
 
   async function updateCover(ev) {
-  
-    const msg="coverPicture";
     const file = ev.target.files?.[0];
-    const formdata = new FormData();
-    formdata.append("image",file)
-    formdata.append("userId", userAuth._id)
-    formdata.append("data",msg)
-    if (file) {
-      setIsUploading(true);    
-      try {
-         await axios.put('api/updateUser/' + userAuth._id,
-          formdata, { headers: { 'Content-Type': 'multipart/form-data' } })
-          setIsUploading(false);
-          if(onChange)onChange();
-      }catch(err){
-        console.log(err);
-      }
-   
-    }
+    setIsUploading(true); 
+    updateUserCoverImg(file,userId).then((result)=>{
+      setIsUploading(false);
+      if(onChange)onChange();
+    }).catch((err)=>{
+      console.log(err);
+    })
+
   }
   return (
     <div className="h-36 overflow-hidden flex justify-center items-center relative">

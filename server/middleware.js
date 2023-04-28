@@ -1,46 +1,19 @@
-module.exports.verifyToken=(req,res)=>{
-  const token=req.cookies.jwt;
-  if(!token) return res.status(401).send("you are not authenticated!")
+const jwt = require('jsonwebtoken')
+require('dotenv').config()
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET,async (err, payload) => {
-    if (err) return res.status(403).send("token is not valid")
-    req.userId = payload
-
-})
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers.authorization
+  if (authHeader) {
+    const token = authHeader.split(' ')[1]
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+      if (err) {
+        return res.status(403).json('Token is not valid!')
+      }
+      req.user = user
+      next()
+    })
+  } else {
+    res.status(401).json('You are not authenticated!')
+  }
 }
-
-  // -------------------------------------------------
-  // const jwt = require('jsonwebtoken')
-
-  // module.exports = {
-
-  //   authenticateToken: (req, res, next) => {
-  //     const authHeader = req.headers.authorization
-
-  //     const token = authHeader && authHeader.split(' ')[1]
-  //     if (token == null) return res.sendStatus(401)
-  //     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-  //       if (err) return res.sendStatus(403)
-  //       req.user = user
-  //       next()
-  //     })
-  //   }
-  // -------------------------------------------------
-
-  //       const refreshToken = jwt.sign({
-  //         username: userCredentials.username,
-  //     }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '1d' });
-
-  //     // Assigning refresh token in http-only cookie
-  //     res.cookie('jwt', refreshToken, { httpOnly: true,
-  //         sameSite: 'None', secure: true,
-  //         maxAge: 24 * 60 * 60 * 1000 });
-  //     return res.json({ accessToken });
-  // }
-  // else {
-  //     // Return unauthorized error if credentials don't match
-  //     return res.status(406).json({
-  //         message: 'Invalid credentials' });
-  // }
-  // })
-}
+module.exports = { verifyToken }

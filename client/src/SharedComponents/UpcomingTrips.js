@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import Axios from "../Utils/Axios";
 import Layout from "./Layout";
 import { Link } from "react-router-dom";
 import useFetchUser from "../Utils/useFetchUser";
@@ -72,7 +72,7 @@ function UpcomingEvents() {
   const [trips, setTrips] = useState([]);
 
   useEffect(() => {
-    axios
+    Axios
       .get("/trip/getAlltrips")
       .then((res) => {
         setTrips(res.data.trips);

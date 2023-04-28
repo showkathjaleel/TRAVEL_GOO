@@ -5,22 +5,23 @@ import Dropzone from "react-dropzone";
 import { useEffect } from "react";
 import { AuthUser } from "../Context/AuthUser";
 import Preloader from "./Preloader";
-import { fetchUser } from "../api/user";
+import { decodeUser, fetchUser } from "../api/user";
 import { createPost } from "../api/post";
 import { validateFileType } from "../Utils/helper";
 
 
-function PostFormCard({home,onChange}) {
-  const { userAuth } = useContext(AuthUser);
+
+function PostFormCard({home,userId,onChange}) {
   const [isUploading, setIsUploading] = useState();
   const [currentuser, setcurrentUser] = useState();
+ 
 
   useEffect(() => {
     getUser();
-  }, [userAuth._id]); 
+  }, []); 
 
 const getUser=()=>{
-  fetchUser(userAuth._id).then((result)=>{
+  fetchUser(userId).then((result)=>{
     setcurrentUser(result)
   })
 }
@@ -30,15 +31,12 @@ const getUser=()=>{
     //validFileType returns true or false
     if (validFileType){
     setIsUploading(true);
-    await createPost(image[0],userAuth._id)
+    await createPost(image[0],userId)
     setIsUploading(false);
     if(onChange){
       onChange();
     }
   }
-  // else{
-  //   setFileErr('Invalid file type. Only images with jpg, jpeg, png, or gif extensions are allowed')
-  // }
     }
 
 

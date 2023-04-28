@@ -1,40 +1,35 @@
-/* eslint-disable react/prop-types */
-
 import PostCard from "./PostCard";
 import Card from "./Card";
 import FriendInfo from "./FriendInfo";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { fetchUser } from "../api/user";
+import { fetchPostsInProfile } from "../api/post";
+import TokenFetch from "../api/tokenFetch";
 
-export default function ProfileContent({ activeTab, userId }) {
+export default function ProfileContent({ activeTab, userId  }) {
   const [posts, setPosts] = useState([]);
   const [friends, setFriends] = useState([]);
-
+  const token=TokenFetch()
+  console.log(token)
 
   useEffect(() => {
     if (!userId) {
       return;
     }
+  getPostsInProfile()
+   }, [userId]);
 
-    async function loadPosts() {
-      const res = await axios.get("/posts/profile/" + userId);
-      
-      setPosts(res.data.sort((p1,p2)=>{
-        return new Date (p2.createdAt)-new Date(p1.createdAt);
-      }))
-      // setPosts(res.data);
-      // setProfile(userAuth);
-    }
-    loadPosts();
-    getUser()
-  }, [userId]);
-
+  const getPostsInProfile=async()=>{
+    fetchPostsInProfile(userId,token).then((result)=>{
+      setPosts(result)
+      getUser()
+    })
+  } 
 
   const getUser = async () => {
-    fetchUser(userId).then((result)=>{
-       setFriends(result.following)
-    })
+    fetchUser(userId).then((result) => {
+      setFriends(result.following);
+    });
   };
 
   return (
@@ -42,13 +37,7 @@ export default function ProfileContent({ activeTab, userId }) {
       {activeTab === "/profile" && (
         <div>
           {posts?.length > 0 &&
-            posts.map((post) => (
-              <PostCard
-                key={post.createdAt}
-                post={post}
-                //  profiles={profile}
-              />
-            ))}
+            posts.map((post) => <PostCard key={post.createdAt} post={post} />)}
         </div>
       )}
       {/* {activeTab === "/profile/about" && (
@@ -75,13 +64,12 @@ export default function ProfileContent({ activeTab, userId }) {
           <Card>
             <h2 className="text-3xl mb-2">Friends</h2>
             <div className="">
-
-              {friends?.length>0 &&
-              friends.map((friend)=>(
-                <div className="border-b border-b-gray-100 p-4 -mx-4">
-                <FriendInfo friends={friend}/>
-              </div>
-              ))}
+              {friends?.length > 0 &&
+                friends.map((friend) => (
+                  <div className="border-b border-b-gray-100 p-4 -mx-4">
+                    <FriendInfo friends={friend} />
+                  </div>
+                ))}
 
               {/* <div className="border-b border-b-gray-100 p-4 -mx-4">
                 <FriendInfo />

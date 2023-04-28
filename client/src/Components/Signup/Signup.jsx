@@ -1,13 +1,15 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import Axios from "../../Utils/Axios";
 import { Link } from "react-router-dom";
 import { validateSignup } from "../../Utils/helper";
+import { registerUser } from "../../api/user";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Signup() {
   const [bool, setBool] = useState(false);
-  const [err, setErr] = useState();
   const [formError, setFormError] = useState({});
   const [islogin, setIslogin] = useState(false);
   const passwordView = () => {
@@ -36,32 +38,10 @@ function Signup() {
     e.preventDefault();
     setFormError(validateSignup(data));
     setIslogin(true);
-
-    //   const userData = {
-    //     username:data.username,
-    //     email: data.email,
-    //     password: data.password,
-    //     confirmpassword:data.confirmpassword,
-    //     phone:data.phone,
-    //   };
-
-    //   axios.post(`/auth/register`,userData
-    //  ).then((response) => {
-    //   console.log(response.status);
-    //   console.log(response.data.token);
-    //    navigate('/login')
-
-    // }).catch((err)=>{
-    //   console.log(err);
-    //   alert(err)
-    // })
   };
 
   useEffect(() => {
-    console.log(formError);
     if (Object.keys(formError).length === 0 && islogin) {
-      console.log(formError);
-
       const userData = {
         username: data.username,
         email: data.email,
@@ -69,68 +49,22 @@ function Signup() {
         confirmpassword: data.confirmpassword,
         phone: data.phone,
       };
-
-      axios
-        .post(`/auth/register`, userData, {
+      
+        Axios.post(`auth/register`, userData, {
           withCredentials: true,
+        }).then((data)=>{
+        navigate("/newlogin");
+        toast.success("Signup successful!");
         })
-        .then(({ data }) => {
-          if (data.bool) {
-            setErr(data.message);
-          } else {
-            navigate("/newlogin");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+       .catch ((err)=>{
+          ((error) => {
+          toast.error(error.response.data.msg, {
+              position: "top-center",
+          });
+       })(err);
+       }) 
     }
   }, [formError]);
-
-  // function validate(data) {
-  //   console.log("log in validate of signup");
-  //   console.log(data);
-  //   console.log("log in validate of signup");
-  //   const error = {};
-  //   const regex =
-  //     /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-  //   // const usernameRegex = /^[a-zA-Z0-9]$/;
-  //   const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-
-  //   if (!data.username) {
-  //     error.username = "Username is Required";
-  //   }
-  //   // else if(!usernameRegex.test(data.username)){
-  //   //   error.username=" Username can contain only alphanumeric characters"
-  //   // }
-
-  //   if (!data.email) {
-  //     error.email = "Email Required!";
-  //   } else if (!regex.test(data.email)) {
-  //     error.email = "Enter a Valid Email";
-  //   }
-
-  //   if (!data.password) {
-  //     error.password = "Password is Required!";
-  //   } else if (data.password.length < 4) {
-  //     error.password = "Password must be more than 4 characters";
-  //   } else if (data.password.length > 12) {
-  //     error.password = "Password cannot exceed more than 12 characters";
-  //   }
-
-  //   if (!data.confirmpassword) {
-  //     error.confirmpassword = "ConfirmPassword is Required!";
-  //   } else if (data.password !== data.confirmpassword) {
-  //     error.confirmpassword = "Passwords do not match";
-  //   }
-  //   if (!data.phone) {
-  //     error.phone = "Phone Number is Required!";
-  //   } else if (!phoneRegex.test(data.phone)) {
-  //     error.phone = "Enter a Valid Phone Number";
-  //   }
-
-  //   return error;
-  // }
 
   return (
     <>
@@ -261,7 +195,7 @@ function Signup() {
 
             <div className="mt-3 text-xs flex justify-between items-center text-[#002D74]">
               <p>Already have an account?</p>
-              <Link to="/login">
+              <Link to="/newlogin">
                 <button className="py-2 px-5 bg-white border rounded-xl hover:scale-110 duration-300">
                   Login
                 </button>
@@ -279,7 +213,6 @@ function Signup() {
         </div>
       </section>
     </>
-
   );
 }
 

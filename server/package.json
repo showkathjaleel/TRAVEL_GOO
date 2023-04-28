@@ -27,7 +27,7 @@
     "npm": "^9.2.0",
     "razorpay": "^2.8.4",
     "sharp": "^0.31.3",
-    "socket.io": "^4.5.4",
+    "socket.io": "^4.6.1",
     "uuid": "^9.0.0"
   },
   "devDependencies": {

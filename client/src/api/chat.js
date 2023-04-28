@@ -1,8 +1,9 @@
-import axios from "axios";
+import Axios from "../Utils/Axios";
+
 
 export const fetchChat = async (senderuserId,recieverUserId) => {
         try {
-          const {data} = await axios.get("/conversation/getspecificconv/" + senderuserId +'/'+ recieverUserId 
+          const {data} = await Axios.get("/conversation/getspecificconv/" + senderuserId +'/'+ recieverUserId 
           );
           console.log(data,'fetchchat')
           return data

@@ -7,8 +7,10 @@ import { auth } from "../../Firebase/Firebase";
 import { RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 // import { async } from '@firebase/util';
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import Axios from "../../Utils/Axios";
 import { validateForgotPassword } from "../../Utils/helper";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function ForgotPassword() {
   const [phone, setPhone] = useState("");
@@ -18,7 +20,7 @@ function ForgotPassword() {
   const [error, setError] = useState("");
   const [formError, setFormError] = useState({});
   const [isForgot, setIsForgot] = useState(false);
-  const Navigate = useNavigate();
+  const navigate = useNavigate();
 
   const configureCaptcha = (phone) => {
     const recaptchaVerifier = new RecaptchaVerifier(
@@ -34,60 +36,46 @@ function ForgotPassword() {
     e.preventDefault();
     setFormError(validateForgotPassword(phone));
     setIsForgot(true);
-
-    // setError("")
-    // if (phoneNumber === "" || phoneNumber === undefined) return setError("Enter a valid Phone Number");
-    // try {
-    //   const response = await configureCaptcha(phone);
-    //   console.log(response, 'response');
-    //   setConfirmOtp(response)
-    //   setBool(true)
-    // } catch (err) {
-    //   console.log(err);
-    //   setError(err.message)
-    // }
   };
 
   useEffect(() => {
     if (Object.keys(formError).length === 0 && isForgot) {
-      axios.post("/auth/forgotpassword", { phone }).then(({ data }) => {
-        if (data.userexist) {
+      Axios.post("auth/forgotpassword", { phone }).then(({ data }) => {
+        // if (data.userexist) {
           configureCaptcha(phone)
             .then((response) => {
               setConfirmOtp(response);
               setBool(true);
             })
             .catch((err) => {
-              console.log(err);
+
+          ((error) => {
+        toast.error(error.response.data.msg, {
+            position: "top-center",
+        });
+    })(err);
             });
-        } else {
-          console.log("user not exists");
-          setError(data.message);
-        }
+        // } else {
+        // toast.error('User Not Found')
+        // }
       });
     }
   });
 
-  // function valid(phone) {
-  //   // const phoneRegex = /^\+91\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-  //   const phoneRegex = /^\+91\d{12}$/;
-  //   const error = {};
-  //   if (!phone === 0) {
-  //     error.phone = "Phone Number is Required";
-  //   } else if (phoneRegex.test(phone)) {
-  //     error.phone = "Enter valid PhoneNumber";
-  //   }
-  //   return error;
-  // }
-
   const otpVerifier = async (e) => {
     e.preventDefault();
-    console.log(otp);
     if (otp === null && otp === "") return;
     try {
       setError("");
       await confirmOtp.confirm(otp);
-      Navigate("/");
+      const {data}=await Axios.post('auth/otplogin',{
+        phone
+      })
+      console.log(data,'data in forgotpassword')
+      document.cookie = `jwt=${data}`;
+      navigate("/");
+      toast.success('Login successful!');
+  
     } catch (err) {
       console.log(err);
       setError(err.message);

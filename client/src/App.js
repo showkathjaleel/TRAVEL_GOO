@@ -1,21 +1,19 @@
 
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import { Fragment, lazy,Suspense } from "react";
+
 import ForgotpasswordPage from "./Pages/ForgotpasswordPage";
+import LoginPage from "./Pages/Login";
 import SignupPage from "./Pages/Signup";
-import HomePage from "./Pages/Home";
+
 import ProtectedRoute from "./Components/protectedRoute/ProtectedRoute";
 import PrivateRoute from "./Components/PrivateRoute/PrivateRoute";
-
-import LoginPage from "./Pages/Login";
-import "react-toastify/dist/ReactToastify.css";
 import DecodeUser from "./SharedComponents/DecodeUser";
-import SavedPosts from "./Pages/SavedPosts";
 
+import HomePage from "./Pages/Home";
+import SavedPosts from "./Pages/SavedPosts";
 import RegisterEventPage from "./Pages/RegisterEventPage";
-// import Room from './Components/Room/Room'
 import Room from './Components/Room/Agora'
 import Notifications from "./Components/Notifications/Notifications";
 import Preloader from "./SharedComponents/Preloader";
@@ -40,8 +38,7 @@ function App() {
             <Route element={<DecodeUser />}>
               <Route element={<PrivateRoute />}>
 
-                <Route exact path="/" element={<HomePage />} />
-              </Route>
+              <Route exact path="/" element={<HomePage />} />       
               <Route path="/profile/*" element={<Suspense fallback={<Preloader/>}> <ProfilePage /></Suspense>} />
               <Route path="/chat" element={<Suspense fallback={<Preloader/>}><ChatPage /></Suspense>} />
               <Route path="/saved" element={<SavedPosts />} />              
@@ -50,15 +47,19 @@ function App() {
               <Route path="/trip-details" element={<Suspense fallback={<Preloader/>}> <TripDetailsPage/> </Suspense> }/>
               <Route path="/room" element={<Room/>} />
               <Route path="/notifications" element={<Notifications/>} />
+              
+                </Route>
             </Route>
 
             <Route element={<ProtectedRoute />}>
-              <Route path="/signup" element={<SignupPage />} />{" "}
+              <Route path="/signup" element={<SignupPage />} />
               {/* used to prevent refreshing */}
               <Route path="/newlogin" element={<LoginPage />} />
+
+              <Route path="/forgotpassword" element={<ForgotpasswordPage />} />
             </Route>
          
-            <Route path="/forgotpassword" element={<ForgotpasswordPage />} />
+           
 
         
           </Routes>

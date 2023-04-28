@@ -10,17 +10,16 @@ import { postDelete } from "../api/post";
 import { savePost } from "../api/post";
 import { fetchUser, followUser } from "../api/user";
 import { fetchComments } from "../api/post";
-
+import TokenFetch from "../api/tokenFetch";
 
 function PostCard({ post,userId ,socket }) {
-
-  const { userAuth } = useContext(AuthUser);
+   const {userAuth}=useContext(AuthUser)
   const [like, setLike] = useState(post.likes.length);
   const [isLiked, setIsLiked] = useState(false);
   const [user, setUser] = useState({});
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
-
+  const token=TokenFetch()
   const [isOpen, setIsOpen] = useState(false);
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -45,8 +44,8 @@ function PostCard({ post,userId ,socket }) {
 
 
   useEffect(() => {
-    setIsLiked(post.likes.includes(userAuth._id));
-  }, [userAuth._id, post.likes]);
+    setIsLiked(post.likes.includes(userId));
+  }, [userId, post.likes]);
 
 
   useEffect(() => {
@@ -54,13 +53,13 @@ function PostCard({ post,userId ,socket }) {
   }, []);
   
   const getComments=()=>{
-    fetchComments(post._id).then((result)=>{
+    fetchComments(post._id,userAuth.accessToken).then((result)=>{
       setComments(result)
     })
   }
 
   const handleLike=()=>{
-    likeHandler(post._id,userAuth._id).then((result)=>{
+    likeHandler(post._id,userId,token).then((result)=>{
       setLike(isLiked ? like - 1 : like + 1);
       setIsLiked(!isLiked);
 
@@ -89,14 +88,14 @@ function PostCard({ post,userId ,socket }) {
      
 
   const savePostHandler=()=>{
-    savePost(post._id,userAuth._id).then((response)=>{
+    savePost(post._id,userId).then((response)=>{
       setIsSaved(true);
       setIsOpen(false)
     })
   }
 
   const followHandler=async()=>{
-   await followUser(post.userId,userAuth._id)
+   await followUser(post.userId,userId)
    getUser()
   }
 
@@ -131,7 +130,7 @@ function PostCard({ post,userId ,socket }) {
         </div>
 
         <div className="relative flex">
-{post.userId === userAuth._id ? (
+{post.userId === userId ? (
          <p></p>
       ) : (
         <button
@@ -139,7 +138,7 @@ function PostCard({ post,userId ,socket }) {
         className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
       >
 
-        {user?.followers?.includes(userAuth._id) ? "following" : "follow"}
+        {user?.followers?.includes(userId) ? "following" : "follow"}
       </button>
       )}        
           <button className="text-gray-400" onClick={toggleDropdown}>
