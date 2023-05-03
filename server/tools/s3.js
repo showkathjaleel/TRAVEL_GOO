@@ -65,13 +65,8 @@ const deleteImagesfromS3 = async (imageName) => {
   console.log(command, '555555555555555555555555')
   const response = await s3.send(command)
   console.log(response, '6666666666666666666666')
+  return 'success'
   // const url = await getSignedUrl(s3, command, { expiresIn: 3600 })
-  // imageName = url
-  // const ImgDeletedUser = await User.findByIdAndUpdate(req.body.userId,
-  //   {
-  //     $unset: { ProfilePicture: imageName }
-  //   })
-  // return res.status(200).json({ ImgDeletedUser })
 }
 
-module.exports = { getImagesfromS3, putImagestoS3 , deleteImagesfromS3}
+module.exports = { getImagesfromS3, putImagestoS3, deleteImagesfromS3 }

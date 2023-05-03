@@ -11,6 +11,7 @@ import { savePost } from "../api/post";
 import { fetchUser, followUser } from "../api/user";
 import { fetchComments } from "../api/post";
 import TokenFetch from "../api/tokenFetch";
+import Swal from "sweetalert";
 
 function PostCard({ post,userId ,socket }) {
    const {userAuth}=useContext(AuthUser)
@@ -95,7 +96,8 @@ function PostCard({ post,userId ,socket }) {
   }
 
   const followHandler=async()=>{
-   await followUser(post.userId,userId)
+  const res= await followUser(post.userId,userId)
+  Swal(res)
    getUser()
   }
 

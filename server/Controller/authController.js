@@ -128,11 +128,11 @@ module.exports.otpLogin = async (req, res) => {
     const phoneNumber = parseInt(phone)
     const user = await User.findOne({ phone: phoneNumber })
     const accessToken = generateAccessToken(user._id)
-    console.log(accessToken,'lahdsald')
+    console.log(accessToken, 'lahdsald')
     const refreshToken = generateRefreshToken(user._id)
     refreshTokens.push(refreshToken)
     res.status(200).json(accessToken)
   } catch (err) {
-     console.log(err)
+    console.log(err)
   }
 }

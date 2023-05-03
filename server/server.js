@@ -32,14 +32,16 @@ app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
 app.use(bodyParser.json({ limit: '30mb', extended: true }))
 app.use(bodyParser.urlencoded({ limit: '30mb', extended: true }))
 
-const corsOptions = {
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
-}
+// const origin = process.env.NODE_ENV === 'production' ? 'api/v1/' : 'http://localhost:3000'
+// const corsOptions = {
+//   // origin: 'http://localhost:3000',
+//   origin: origin,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//   credentials: true,
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }
 
-app.use(cors(corsOptions))
+app.use(cors())
 
 app.use('/api/v1/api', userRoute)
 app.use('/api/v1/auth', authRoute)

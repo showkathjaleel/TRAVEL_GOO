@@ -6,9 +6,6 @@ const baseURL = process.env.NODE_ENV === 'production' ? 'api/v1/' : 'http://loca
   const Axios=axios.create({
     baseURL ,
 })
-
-
-
 export default Axios;
 
 

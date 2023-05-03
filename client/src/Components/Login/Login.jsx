@@ -38,7 +38,7 @@ function Login() {
             ...values,
           },
           {
-            withCredentials: true,
+            headers: { "Content-Type": "application/json" },
           }
         )
         .then(({data}) => {

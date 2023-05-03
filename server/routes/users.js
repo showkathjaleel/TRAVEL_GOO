@@ -29,8 +29,6 @@ router.get('/friends/:id', userController.getFriends)
 
 router.post('/refresh', userController.refresh)
 
-router.post('/logout', userController.logout)
-
 module.exports = router
 
 //  /api/getUser?userId='+friendId
