@@ -1,17 +1,12 @@
 # TRAVEL_GOO
 
 
-# Project Title
-
-A brief description of what this project does and who it's for
-
-TRAVEL_GOO
-
 This is a social media application  for travellers  built with React that allows users to create profiles, share posts and connect with friends/followers .It allows users to search and view upcoming trips, join the trip , and chat with friends in real-time.
 
 Features
 
-- Real time Chat  using socket.io that allows users to communicate 
+- Real time Chat  using socket.io that allows  bidirectional communication between clients and servers .
+- Video Call using ZegoCloud (A cloud-based platform for building video call )
 - Payment Integration (Razorpay) 
 - Implemented Lazy loading for improved performance.
 -  Storing images in Amazon S3 bucket  to reduce the memory of API calls
@@ -23,8 +18,10 @@ Technologies Used
 
 - React: A popular JavaScript library for building user interfaces.
 - Redux: A predictable state container for managing application state.
-- Express: YouTube Data API v3 for fetching video data.
-- MongoDB: A non relational database to store all the datas.
+- Express: A web application framework for Node.js that simplifies HTTP requests and routing.
+- MongoDB: A NoSQL database for storing unstructured data at scale.
+- Socket.IO: A JavaScript library for real-time, bidirectional communication between clients and servers.
+- ZegoCloud: A cloud-based platform for building and deploying real-time communication applications, including video chat and live streaming.
 - Tailwind: A popular CSS framework for styling user interfaces.
 
 
